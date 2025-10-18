@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAF Tech - Demo for SRS Preparation</title>
+    <meta name="description" content="Common Template">
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+:root{
+  --headerH: 0px;
+  --footerH: 60px;
+  --sidebarW: 280px;
+}
+
+header, nav { position: relative; z-index: 1100; }
+
+/* Main Content Styles */
+.main-content-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content-area {
+  flex: 1;
+  background: #e7e8e9;
+  padding: 20px;
+}
+
+/* Stepper Styles */
+.stepper-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+}
+
+.stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.stepper-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1; /* slate-300 */
+  background: #fff;
+  color: #334155; /* slate-700 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+
+.stepper-label {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stepper-line {
+  height: 2px;
+  background: #e5e7eb;
+  flex: 1;
+}
+
+.stepper-item.active .stepper-circle {
+  border-color: #2563eb; /* blue-600 */
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.stepper-item.completed .stepper-circle {
+  border-color: #10b981; /* emerald-500 */
+  background: #10b981;
+  color: #fff;
+}
+
+.stepper-item.completed + .stepper-line {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+/* Fade in for content swaps */
+.fade-container { position: relative; min-height: 300px; }
+.fade-in { animation: fadeIn 250ms ease-in-out; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Layout Styles (to align preview on the right) */
+.form-container {
+  display: flex;
+  gap: 0.5rem;
+  height: auto;
+  padding: 0.25rem;
+  overflow: visible;
+}
+
+.form-section {
+  flex: 1;
+  transition: width 0.3s ease;
+  overflow: visible;
+  height: auto;
+  max-height: none;
+}
+
+.form-section.compact {
+  width: 50%;
+  flex: 0 0 50%;
+}
+
+.preview-section {
+  width: 50%;
+  flex: 0 0 50%;
+  transition: all 0.3s ease;
+  overflow: visible;
+  height: auto;
+  max-height: none;
+}
+
+.preview-section.hidden { display: none; }
+
+/* Accordion Styles (copied to match Left+Form.html) */
+.accordion-section {
+  margin-bottom: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+.accordion-section:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); border-color: #cbd5e1; }
+.accordion-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.accordion-header:hover { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); }
+.accordion-header h3 { margin: 0; color: #1e293b; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.025em; display: flex; align-items: center; gap: 0.75rem; }
+.accordion-header h3::before { content: ''; width: 4px; height: 24px; background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%); border-radius: 0.25rem; }
+.accordion-toggle { background: none; border: none; color: #64748b; font-size: 1.5rem; cursor: pointer; padding: 0.25rem; border-radius: 0.375rem; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
+.accordion-toggle:hover { background: #e2e8f0; color: #374151; transform: scale(1.1); }
+.accordion-toggle.active { transform: rotate(180deg); color: #be1e2d; }
+.accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: #ffffff; }
+.accordion-content.expanded { max-height: 2000px; padding: 0.5rem; }
+.accordion-content.collapsed { max-height: 0; padding: 0 0.5rem; }
+
+/* Action Buttons Styles (match Left+Form.html) */
+.action-buttons { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-top: 1px solid #e2e8f0; padding: 0.75rem; border-radius: 0 0 1rem 1rem; display: flex; gap: 0.75rem; align-items: center; justify-content: flex-start; }
+.action-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; letter-spacing: 0.025em; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; position: relative; overflow: hidden; width: 100px; text-align: center; font-size: 0.875rem; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.action-btn-primary { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+.action-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4); background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+.action-btn-secondary { background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%); color: #fff; border-color: #be1e2d; box-shadow: 0 4px 15px rgba(190, 30, 45, 0.3); }
+.action-btn-secondary:hover { background: linear-gradient(135deg, #9e1825 0%, #7e141e 100%); color: #fff; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(190, 30, 45, 0.4); }
+.action-btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+.action-btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+.action-btn-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+.action-btn-warning:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4); background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+
+/* Form field containers and inputs (match Left+Form.html) */
+.form-field-container { display: flex; flex-direction: column; align-items: flex-start; position: relative; }
+.form-field-container label { font-size: 0.7rem; font-weight: 600; color: #1f2937; margin-bottom: 0.125rem; letter-spacing: 0.025em; transition: color 0.2s ease; line-height: 1.2; }
+.form-field-container input,
+.form-field-container select,
+.form-field-container textarea { border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: #ffffff; color: #374151; width: 100%; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+.form-field-container input:hover,
+.form-field-container select:hover,
+.form-field-container textarea:hover { border-color: #9ca3af; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+.form-field-container input:focus,
+.form-field-container select:focus,
+.form-field-container textarea:focus { outline: none; border-color: #be1e2d; box-shadow: 0 0 0 4px rgba(190, 30, 45, 0.15); transform: translateY(-1px); }
+.form-field-container input::placeholder,
+.form-field-container textarea::placeholder { color: #9ca3af; font-style: italic; }
+
+/* Upload button/section styling */
+.upload-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%); border: none; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-weight: 600; letter-spacing: 0.025em; position: relative; overflow: hidden; white-space: nowrap; }
+.upload-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s ease; }
+.upload-btn:hover::before { left: 100%; }
+.upload-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(190, 30, 45, 0.3); background: linear-gradient(135deg, #9e1825 0%, #7e141e 100%); }
+.upload-btn:active { transform: translateY(0); }
+.upload-section { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden; }
+.upload-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #10b981 0%, #059669 50%, #10b981 100%); }
+.upload-field { width: 100%; max-width: 250px; }
+
+/* Preview container styling */
+#fileContent { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px solid #e2e8f0; border-radius: 0.75rem; min-height: 500px; height: 100%; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden; }
+#fileContent::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #be1e2d 0%, #ea580c 50%, #be1e2d 100%); border-radius: 0.75rem 0.75rem 0 0; }
+.preview-section:not(.hidden) { display: flex !important; flex-direction: column; height: 100%; }
+.preview-section:not(.hidden) > div:first-child { flex-shrink: 0; }
+.preview-section:not(.hidden) #fileContent { flex: 1; overflow-y: auto; min-height: 0; }
+
+/* Compact form field widths (match Left+simpleform.html) */
+.compact-form input,
+.compact-form select,
+.compact-form textarea {
+  width: 100%;
+  max-width: 200px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.compact-form textarea {
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Table-related styles from Left+table.html */
+/* Ensure edit buttons are visible */
+.edit-button {
+  background-color: #db8432 !important; /* orange-500 */
+  color: white !important;
+  border: 2px solid #ea580c !important; /* orange-600 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+  font-weight: bold !important;
+}
+
+.edit-button:hover {
+  background-color: #ea580c !important; /* orange-600 */
+  border-color: #c2410c !important; /* orange-700 */
+}
+
+/* Download dropdown enhancements */
+#downloadDropdown3 {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Table row hover effects */
+tbody tr:hover {
+  background-color: #f8fafc !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+/* Alternating row colors (zebra striping) */
+tbody tr:nth-child(even) {
+  background-color: #f8f9fa !important;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ffffff !important;
+}
+
+/* Action buttons enhancement */
+.action-buttons {
+  transition: all 0.2s ease;
+}
+
+.action-buttons button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Action Buttons Uniform Styling - Only for table action buttons */
+.action-buttons button {
+    width: 24px;
+    height: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-size: 10px;
+}
+
+.action-buttons button svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* Normal sized action buttons for forms (Steps 1 & 2) */
+.action-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    height: auto;
+}
+
+.action-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Table Row Consistency - Match Left+table.html compact styling */
+#dataTable3 tbody tr {
+    vertical-align: middle;
+    height: 28px; /* Further reduced height for ultra-compact rows */
+}
+
+#dataTable3 tbody td {
+    vertical-align: middle;
+    padding: 0.125rem 0.25rem; /* Further reduced padding for ultra-compact cells */
+    line-height: 1.1; /* Even tighter line height */
+    font-size: 11px; /* Slightly smaller font */
+}
+
+#dataTable3 thead th {
+    padding: 0.125rem 0.25rem; /* Match tbody padding for consistency */
+    height: 28px; /* Match row height */
+    font-size: 11px; /* Match font size */
+}
+
+/* Status Badge Styles */
+.status-badge {
+    display: inline-block;
+    padding: 1px 4px; /* Even more reduced padding for ultra-compact badges */
+    border-radius: 8px; /* Smaller border radius */
+    font-size: 9px; /* Smaller font size */
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 40px; /* Further reduced minimum width */
+    vertical-align: middle;
+}
+
+.status-pending {
+    background-color: #be1e2d;
+    color: white;
+}
+
+.status-in-progress {
+    background-color: #ea580c;
+    color: white;
+}
+
+.status-completed {
+    background-color: #16a34a;
+    color: white;
+}
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="flex flex-col min-h-screen">
+        <div class="flex flex-col min-h-screen">
+
+
+            <!-- Main Content Area -->
+            <div class="main-content-wrapper">
+                
+                <!-- Main Content -->
+                <div class="main-content-area bg-gray-50 p-6" style="width: 100%;">
+                    <div class="max-w-full mx-auto">
+                        <!-- Horizontal Stepper -->
+                        <div id="stepper" class="stepper-wrapper">
+                            <div class="stepper-item active" data-step="1">
+                                <div class="stepper-circle">1</div>
+                                <div class="stepper-label">Step 1: Basic Info</div>
+                            </div>
+                            <div class="stepper-line"></div>
+                            <div class="stepper-item" data-step="2">
+                                <div class="stepper-circle">2</div>
+                                <div class="stepper-label">Step 2: Details</div>
+                            </div>
+                            <div class="stepper-line"></div>
+                            <div class="stepper-item" data-step="3">
+                                <div class="stepper-circle">3</div>
+                                <div class="stepper-label">Step 3: Review</div>
+                            </div>
+                            <div class="stepper-line"></div>
+                            <div class="stepper-item" data-step="4">
+                                <div class="stepper-circle">4</div>
+                                <div class="stepper-label">Step 4: Confirm</div>
+                            </div>
+                            <div class="stepper-line"></div>
+                            <div class="stepper-item" data-step="5">
+                                <div class="stepper-circle">5</div>
+                                <div class="stepper-label">Step 5: Finish</div>
+                            </div>
+                        </div>
+
+                        <!-- Step Content Host -->
+                        <div id="stepContent" class="fade-container"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+
+        // -----------------------------
+        // Stepper: Step 1 Template (copied main content from Left+Form.html)
+        // -----------------------------
+        const step1Template = `
+            <!-- File Upload Section -->
+            <div class="upload-section p-2 mb-2">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button id="uploadBtn" class="upload-btn text-white text-xs flex items-center whitespace-nowrap">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            Upload
+                        </button>
+                        <input id="fileDisplay" type="text" value="No File Chosen" readonly class="upload-field px-2 py-1 border border-gray-200 rounded text-xs bg-white cursor-pointer focus:border-blue-500 focus:outline-none transition-all duration-200 flex-shrink-0" style="width: 150px;">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 mt-1 font-medium">Upload scanned document to autofill below form.</p>
+            </div>
+
+            <!-- Main Form Container -->
+            <div class="form-container">
+                <!-- Form Section -->
+                <div id="formSection" class="form-section bg-white rounded-lg shadow-sm p-2 overflow-hidden compact-form">
+                    <!-- Personal Details Accordion -->
+                    <div class="accordion-section" data-section="personal">
+                        <div class="accordion-header" onclick="toggleAccordion('personal')">
+                            <h3>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                Personal Details
+                            </h3>
+                            <button class="accordion-toggle" type="button">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="accordion-content expanded" id="personal-content">
+                            <div class="grid grid-cols-5 gap-2">
+                                <div class="form-field-container">
+                                    <label>Name*</label>
+                                    <input type="text" name="name" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Phone Number*</label>
+                                    <input type="tel" name="phone" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Email*</label>
+                                    <input type="email" name="email" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Address Line 1*</label>
+                                    <input type="text" name="address1" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Address Line 2</label>
+                                    <input type="text" name="address2">
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Address Line 3</label>
+                                    <input type="text" name="address3">
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Select State*</label>
+                                    <select name="state" required>
+                                        <option>Select State</option>
+                                    </select>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Date of Birth*</label>
+                                    <input type="text" name="dob" placeholder="DD/MM/YYYY" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Gender*</label>
+                                    <div class="flex items-center space-x-2 mt-2">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="gender" value="male" checked class="mr-1">
+                                            <span class="text-xs">Male</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="gender" value="female" class="mr-1">
+                                            <span class="text-xs">Female</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-field-container">
+                                    <label class="flex items-center mt-6" style="white-space: nowrap; min-width: 0;">
+                                        <input type="checkbox" name="relocate" checked class="mr-1" style="flex-shrink: 0;">
+                                        <span class="text-xs">Willing to relocate</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Details Accordion -->
+                    <div class="accordion-section" data-section="additional">
+                        <div class="accordion-header" onclick="toggleAccordion('additional')">
+                            <h3>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                </svg>
+                                Additional Details
+                            </h3>
+                            <button class="accordion-toggle" type="button">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="accordion-content collapsed" id="additional-content">
+                            <div class="grid grid-cols-5 gap-2">
+                                <div class="form-field-container">
+                                    <label>Select Bank*</label>
+                                    <select name="bank" required>
+                                        <option>Select Bank</option>
+                                    </select>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Account No.*</label>
+                                    <input type="text" name="account" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>IFSC*</label>
+                                    <input type="text" name="ifsc" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Branch*</label>
+                                    <input type="text" name="branch" required>
+                                </div>
+                                <div class="form-field-container">
+                                    <label>Contact No.</label>
+                                    <input type="tel" name="contact">
+                                </div>
+                                <div class="col-span-5 form-field-container">
+                                    <label>Description</label>
+                                    <textarea name="description" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="action-btn action-btn-primary" id="previewBtnStep1">Preview</button>
+                        <button class="action-btn action-btn-success" id="submitBtnStep1">Submit</button>
+                        <button class="action-btn action-btn-secondary" id="cancelBtnStep1">Cancel</button>
+                        <button class="action-btn action-btn-warning flex items-center" id="clearBtnStep1">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- File Preview Section (Hidden by default) -->
+                <div id="previewSection" class="preview-section hidden bg-white rounded-lg shadow-sm p-2 overflow-hidden">
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-200 pb-1">
+                        <h3 class="text-base font-semibold text-gray-800">Uploaded File Preview</h3>
+                        <div class="flex space-x-2">
+                            <button class="p-2 text-gray-600 hover:text-gray-800" id="printBtnStep1" title="Print">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                                </svg>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded" id="closePreviewBtnStep1" title="Close Preview">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="fileContent" class="bg-gray-100 p-4 rounded text-xs overflow-y-auto" style="height: calc(100vh - 450px); min-height: 500px;">
+                        <div class="text-center text-gray-600">Loading file preview...</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Load step content
+        function loadStep(step) {
+            const stepper = document.getElementById('stepper');
+            const items = stepper.querySelectorAll('.stepper-item');
+            const contentHost = document.getElementById('stepContent');
+
+            // Update visual states
+            items.forEach((item, idx) => {
+                item.classList.remove('active');
+                item.classList.toggle('completed', idx + 1 < step);
+                if (idx + 1 === step) item.classList.add('active');
+            });
+
+            // Inject content
+            if (step === 1) {
+                contentHost.innerHTML = step1Template;
+                contentHost.classList.add('fade-in');
+                setTimeout(() => contentHost.classList.remove('fade-in'), 260);
+                initStep1(contentHost);
+            } else if (step === 2) {
+                contentHost.innerHTML = step2Template;
+                contentHost.classList.add('fade-in');
+                setTimeout(() => contentHost.classList.remove('fade-in'), 260);
+                initStep2(contentHost);
+            } else if (step === 3) {
+                contentHost.innerHTML = step3Template;
+                contentHost.classList.add('fade-in');
+                setTimeout(() => contentHost.classList.remove('fade-in'), 260);
+                initStep3(contentHost);
+            } else {
+                contentHost.innerHTML = `
+                    <div class="fade-in bg-white rounded-lg border border-gray-200 p-6 text-sm text-gray-700">
+                        Step ${step} – Coming soon
+                    </div>
+                `;
+                contentHost.classList.add('fade-in');
+                setTimeout(() => contentHost.classList.remove('fade-in'), 260);
+            }
+        }
+
+        // Initialize Step 1 functionality (scoped to host)
+        function initStep1(host) {
+            const uploadBtn = host.querySelector('#uploadBtn');
+            const fileInput = host.querySelector('#fileDisplay');
+            const formSection = host.querySelector('#formSection');
+            const previewSection = host.querySelector('#previewSection');
+
+            // Hidden file input
+            const hiddenFileInput = document.createElement('input');
+            hiddenFileInput.type = 'file';
+            hiddenFileInput.accept = '.pdf,.jpg,.jpeg,.png,.doc,.docx,.txt';
+            hiddenFileInput.style.display = 'none';
+            host.appendChild(hiddenFileInput);
+
+            if (uploadBtn) {
+                uploadBtn.addEventListener('click', (e) => { e.preventDefault(); hiddenFileInput.click(); });
+            }
+            if (fileInput) {
+                fileInput.addEventListener('click', () => hiddenFileInput.click());
+                fileInput.addEventListener('dblclick', () => {
+                    fileInput.value = 'No File Chosen';
+                    previewSection.classList.add('hidden');
+                    formSection.classList.remove('compact');
+                    hiddenFileInput.value = '';
+                });
+            }
+
+            hiddenFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                fileInput.value = file.name;
+                previewSection.classList.remove('hidden');
+                formSection.classList.add('compact');
+                displayFilePreview(file);
+            });
+
+            function displayFilePreview(file) {
+                const fileContent = host.querySelector('#fileContent');
+                if (!fileContent) return;
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.className = 'max-w-full h-auto rounded';
+                    img.alt = file.name;
+                    fileContent.innerHTML = '';
+                    fileContent.appendChild(img);
+                } else if (file.type === 'application/pdf') {
+                    const embed = document.createElement('embed');
+                    embed.src = URL.createObjectURL(file);
+                    embed.type = 'application/pdf';
+                    embed.className = 'w-full';
+                    embed.style.height = 'calc(100vh - 450px)';
+                    embed.style.minHeight = '500px';
+                    fileContent.innerHTML = '';
+                    fileContent.appendChild(embed);
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const text = ev.target.result;
+                        fileContent.innerHTML = `<pre class="whitespace-pre-wrap text-xs">${text}</pre>`;
+                    };
+                    reader.readAsText(file);
+                }
+            }
+
+            // Accordion (ensure initial states respected; click toggles)
+            host.querySelectorAll('.accordion-header').forEach((hdr) => {
+                hdr.addEventListener('click', () => {
+                    const section = hdr.parentElement;
+                    const content = section.querySelector('.accordion-content');
+                    const toggle = hdr.querySelector('.accordion-toggle');
+                    const isExpanded = content.classList.contains('expanded');
+                    content.classList.toggle('expanded', !isExpanded);
+                    content.classList.toggle('collapsed', isExpanded);
+                    if (toggle) toggle.classList.toggle('active', !isExpanded);
+                });
+            });
+
+            // Preview/Submit/Clear
+            const previewBtn = host.querySelector('#previewBtnStep1');
+            const submitBtn = host.querySelector('#submitBtnStep1');
+            const clearBtn = host.querySelector('#clearBtnStep1');
+            const closePreviewBtn = host.querySelector('#closePreviewBtnStep1');
+            const printBtn = host.querySelector('#printBtnStep1');
+
+            function showPreviewSection() {
+                if (previewSection && formSection) {
+                    previewSection.classList.remove('hidden');
+                    formSection.classList.add('compact');
+                }
+            }
+
+            function captureFormData() {
+                const data = { personal: {}, additional: {} };
+                host.querySelectorAll('#personal-content input, #personal-content select').forEach((input) => {
+                    if (input.type === 'radio') { if (input.checked) data.personal[input.name] = input.value; }
+                    else if (input.type === 'checkbox') { data.personal[input.name] = input.checked ? 'Yes' : 'No'; }
+                    else { data.personal[input.name] = input.value || ''; }
+                });
+                host.querySelectorAll('#additional-content input, #additional-content select, #additional-content textarea').forEach((input) => {
+                    data.additional[input.name || input.id] = input.value || '';
+                });
+                return { formData: data };
+            }
+
+            function displayFormPreview(data) {
+                const { formData } = data;
+                const fileContent = host.querySelector('#fileContent');
+                if (!fileContent) return;
+                fileContent.innerHTML = `
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-800 mb-2 text-sm">Personal Details</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><strong>Name:</strong> <span id="p1-name" class="text-gray-600">${formData.personal.name || 'Not provided'}</span></div>
+                            <div><strong>Email:</strong> <span id="p1-email" class="text-gray-600">${formData.personal.email || 'Not provided'}</span></div>
+                            <div><strong>Phone Number:</strong> <span id="p1-phone" class="text-gray-600">${formData.personal.phone || 'Not provided'}</span></div>
+                            <div><strong>Date of Birth:</strong> <span id="p1-dob" class="text-gray-600">${formData.personal.dob || 'Not provided'}</span></div>
+                            <div><strong>Gender:</strong> <span id="p1-gender" class="text-gray-600">${formData.personal.gender || 'Not provided'}</span></div>
+                            <div><strong>State:</strong> <span id="p1-state" class="text-gray-600">${formData.personal.state || 'Not provided'}</span></div>
+                            <div><strong>Address1:</strong> <span id="p1-address1" class="text-gray-600">${formData.personal.address1 || 'Not provided'}</span></div>
+                            <div><strong>Address2:</strong> <span id="p1-address2" class="text-gray-600">${formData.personal.address2 || 'Not provided'}</span></div>
+                            <div><strong>Address3:</strong> <span id="p1-address3" class="text-gray-600">${formData.personal.address3 || 'Not provided'}</span></div>
+                            <div><strong>Relocate:</strong> <span id="p1-relocate" class="text-gray-600">${formData.personal.relocate || 'Not provided'}</span></div>
+                        </div>
+                    </div>
+                    <div class="border-t pt-3">
+                        <h4 class="font-semibold text-gray-800 mb-2 text-sm">Additional Details</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><strong>Bank:</strong> <span id="p1-bank" class="text-gray-600">${formData.additional.bank || 'Not provided'}</span></div>
+                            <div><strong>Account No.:</strong> <span id="p1-account" class="text-gray-600">${formData.additional.account || 'Not provided'}</span></div>
+                            <div><strong>IFSC:</strong> <span id="p1-ifsc" class="text-gray-600">${formData.additional.ifsc || 'Not provided'}</span></div>
+                            <div><strong>Branch:</strong> <span id="p1-branch" class="text-gray-600">${formData.additional.branch || 'Not provided'}</span></div>
+                            <div><strong>Contact No.:</strong> <span id="p1-contact" class="text-gray-600">${formData.additional.contact || 'Not provided'}</span></div>
+                            <div class="col-span-2"><strong>Description:</strong> <span id="p1-description" class="text-gray-600">${formData.additional.description || 'Not provided'}</span></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updatePreviewField(id, value) {
+                const el = host.querySelector('#' + id);
+                if (el) el.textContent = value || 'Not provided';
+            }
+
+            function updateLivePreview() {
+                if (previewSection.classList.contains('hidden')) return;
+                const data = captureFormData();
+                updatePreviewField('p1-name', data.formData.personal.name);
+                updatePreviewField('p1-email', data.formData.personal.email);
+                updatePreviewField('p1-phone', data.formData.personal.phone);
+                updatePreviewField('p1-dob', data.formData.personal.dob);
+                updatePreviewField('p1-gender', data.formData.personal.gender);
+                updatePreviewField('p1-state', data.formData.personal.state);
+                updatePreviewField('p1-address1', data.formData.personal.address1);
+                updatePreviewField('p1-address2', data.formData.personal.address2);
+                updatePreviewField('p1-address3', data.formData.personal.address3);
+                updatePreviewField('p1-relocate', data.formData.personal.relocate);
+                updatePreviewField('p1-bank', data.formData.additional.bank);
+                updatePreviewField('p1-account', data.formData.additional.account);
+                updatePreviewField('p1-ifsc', data.formData.additional.ifsc);
+                updatePreviewField('p1-branch', data.formData.additional.branch);
+                updatePreviewField('p1-contact', data.formData.additional.contact);
+                updatePreviewField('p1-description', data.formData.additional.description);
+            }
+
+            function clearForm() {
+                host.querySelectorAll('#personal-content input, #personal-content select, #additional-content input, #additional-content select, #additional-content textarea').forEach((input) => {
+                    if (input.type === 'radio') {
+                        if (input.value === 'male') input.checked = true; else input.checked = false;
+                    } else if (input.type === 'checkbox') {
+                        if (input.name === 'relocate') input.checked = true; else input.checked = false;
+                    } else if (['text','email','tel'].includes(input.type)) {
+                        input.value = '';
+                    } else if (input.tagName === 'SELECT') {
+                        input.selectedIndex = 0;
+                    } else if (input.tagName === 'TEXTAREA') {
+                        input.value = '';
+                    }
+                });
+                if (fileInput) fileInput.value = 'No File Chosen';
+                if (previewSection) previewSection.classList.add('hidden');
+                if (formSection) formSection.classList.remove('compact');
+            }
+
+            if (previewBtn) {
+                previewBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const data = captureFormData();
+                    displayFormPreview(data);
+                    showPreviewSection();
+                    updateLivePreview();
+                });
+            }
+            if (submitBtn) {
+                submitBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const data = captureFormData();
+                    alert('Form submitted successfully!\n\n' + JSON.stringify(data.formData, null, 2));
+                });
+            }
+            if (clearBtn) {
+                clearBtn.addEventListener('click', (e) => { e.preventDefault(); clearForm(); });
+            }
+            if (closePreviewBtn) {
+                closePreviewBtn.addEventListener('click', (e) => { e.preventDefault(); previewSection.classList.add('hidden'); formSection.classList.remove('compact'); });
+            }
+            if (printBtn) {
+                printBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    printFormPreview();
+                });
+            }
+
+            // Add live preview event listeners
+            host.querySelectorAll('#personal-content input, #personal-content select, #additional-content input, #additional-content select, #additional-content textarea').forEach((input) => {
+                input.addEventListener('input', updateLivePreview);
+                input.addEventListener('change', updateLivePreview);
+            });
+
+            function printFormPreview() {
+                const printWindow = window.open('', '_blank');
+                const navHeading = document.querySelector('#navHeading h2');
+                const dynamicTitle = navHeading ? navHeading.textContent : 'Step 1';
+                const fileContent = host.querySelector('#fileContent');
+                
+                if (!fileContent || fileContent.innerHTML.includes('Loading file preview...')) {
+                    alert('Please generate a preview first by clicking the Preview button.');
+                    return;
+                }
+                
+                const printContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>${dynamicTitle} - Form Preview</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                            .header h1 { color: #be1e2d; margin: 0; }
+                            .header p { color: #666; margin: 5px 0; }
+                            .print-info { margin: 20px 0; padding: 10px; background-color: #f9f9f9; border-radius: 5px; }
+                            .print-info p { margin: 5px 0; }
+                            .preview-content { margin-top: 20px; }
+                            @media print {
+                                .no-print { display: none; }
+                                body { margin: 0; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>Department of Posts</h1>
+                            <p>Ministry of Communications, Government of India</p>
+                            <h2 style="color: #be1e2d; font-weight: bold; margin: 10px 0;">${dynamicTitle} - Form Preview</h2>
+                        </div>
+                        
+                        <div class="print-info">
+                            <p><strong>Print Date:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Print Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                            <p><strong>User:</strong> System User</p>
+                        </div>
+                        
+                        <div class="preview-content">
+                            ${fileContent.innerHTML}
+                        </div>
+                        
+                        <div style="margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
+                            <p>This document was generated from ${dynamicTitle} module</p>
+                            <p>© Copyright Department of Posts</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                printWindow.document.write(printContent);
+                printWindow.document.close();
+                
+                printWindow.onload = function() {
+                    printWindow.print();
+                    printWindow.onafterprint = function() {
+                        printWindow.close();
+                    };
+                };
+            }
+        }
+
+        // Stepper click handlers and default load
+        document.addEventListener('DOMContentLoaded', function() {
+            const items = document.querySelectorAll('#stepper .stepper-item');
+            items.forEach((el) => el.addEventListener('click', () => loadStep(Number(el.getAttribute('data-step')))));
+            loadStep(1); // default
+        });
+
+        // -----------------------------
+        // Step 3 Template (Complete from Left+table.html)
+        // -----------------------------
+        const step3Template = `
+            <div class="max-w-full mx-auto">
+                <!-- Filter Section -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                    <div class="flex flex-wrap items-center gap-3 text-xs">
+                        <div class="flex items-center gap-2">
+                            <label class="font-medium text-gray-700">Customer ID:</label>
+                            <input type="text" id="filterCustomerId3" placeholder="Enter Customer ID" class="rounded px-2 py-1 w-32 text-xs" style="border: 2px solid #be1e2d;">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="font-medium text-gray-700">Contract ID:</label>
+                            <input type="text" id="filterContractId3" placeholder="Enter Contract ID" class="rounded px-2 py-1 w-32 text-xs" style="border: 2px solid #be1e2d;">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="font-medium text-gray-700">Service Name:</label>
+                            <input type="text" id="filterServiceName3" placeholder="Enter Service Name" class="rounded px-2 py-1 w-32 text-xs" style="border: 2px solid #be1e2d;">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="font-medium text-gray-700">From Date:</label>
+                            <input type="date" id="filterFromDate3" class="rounded px-2 py-1 w-28 text-xs" style="border: 2px solid #be1e2d;">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="font-medium text-gray-700">To Date:</label>
+                            <input type="date" id="filterToDate3" class="rounded px-2 py-1 w-28 text-xs" style="border: 2px solid #be1e2d;">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="font-medium text-gray-700">Progress:</label>
+                            <select id="filterProgress3" class="rounded px-2 py-1 w-28 text-xs" style="border: 2px solid #be1e2d;">
+                                <option value="">All</option>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <button id="filterBtn3" class="text-white px-3 py-1 rounded text-xs flex items-center gap-1" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 4C3 3.44772 3.44772 3 4 3H20C20.5523 3 21 3.44772 21 4V6.58579C21 6.851 20.8946 7.10536 20.7071 7.29289L14.2929 13.7071C14.1054 13.8946 14 14.149 14 14.4142V17L10 21V14.4142C10 14.149 9.89464 13.8946 9.70711 13.7071L3.29289 7.29289C3.10536 7.10536 3 6.851 3 6.58579V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Filter
+                        </button>
+                        <button id="clearFilterBtn3" class="text-white px-3 py-1 rounded text-xs flex items-center gap-1" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Clear
+                        </button>
+                        <div class="flex gap-2 ml-auto">
+                            <button id="printBtn3" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs flex items-center gap-1">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 2L6 6M6 6L10 6M6 6L6 10M6 18L6 22M6 18L10 18M6 18L6 14M18 2L18 6M18 6L14 6M18 6L18 10M18 18L18 22M18 18L14 18M18 18L18 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Print
+                            </button>
+                            <!-- Download Dropdown -->
+                            <div class="relative">
+                                <button id="downloadBtn3" class="text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Download
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Download Dropdown Menu -->
+                                <div id="downloadDropdown3" class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+                                    <div class="py-2">
+                                        <button onclick="downloadTable3('excel')" class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M14 2V8H20" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M16 13H8" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M16 17H8" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M10 9H8" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <div>
+                                                <div class="font-medium text-gray-900">Download as Excel</div>
+                                                <div class="text-xs text-gray-500">.xlsx format</div>
+                                            </div>
+                                        </button>
+                                        
+                                        <button onclick="downloadTable3('pdf')" class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M14 2V8H20" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M16 13H8" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M16 17H8" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M10 9H8" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <div>
+                                                <div class="font-medium text-gray-900">Download as PDF</div>
+                                                <div class="text-xs text-gray-500">.pdf format</div>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Results Info -->
+                <div id="filterInfo3" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 hidden">
+                    <div class="flex items-center gap-2 text-sm text-blue-800">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span id="filterResultsText3">Showing filtered results</span>
+                    </div>
+                </div>
+
+                <!-- Table Section -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table id="dataTable3" class="w-full text-xs">
+                            <thead style="background-color: #be1e2d;">
+                                <tr>
+                                    <th class="text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable3(0)">
+                                        <div class="flex items-center gap-1">
+                                            Sl. No.
+                                            <svg class="sort-icon w-2 h-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                            </svg>
+                                        </div>
+                                    </th>
+                                    <th class="text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable3(1)">
+                                        <div class="flex items-center gap-1">
+                                            Customer ID
+                                            <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                            </svg>
+                                        </div>
+                                    </th>
+                                    <th class="text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable3(2)">
+                                        <div class="flex items-center gap-1">
+                                            Contract ID
+                                            <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                            </svg>
+                                        </div>
+                                    </th>
+                                    <th class="text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable3(3)">
+                                        <div class="flex items-center gap-1">
+                                            Service Name
+                                            <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                            </svg>
+                                        </div>
+                                    </th>
+                                    <th class="text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable3(4)">
+                                        <div class="flex items-center gap-1">
+                                            Submission Date
+                                            <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                            </svg>
+                                        </div>
+                                    </th>
+                                    <th class="text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable3(5)">
+                                        <div class="flex items-center gap-1">
+                                            Progress
+                                            <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                            </svg>
+                                        </div>
+                                    </th>
+                                    <th class="text-left font-medium text-white border-b" style="background-color: #be1e2d;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td>1</td>
+                                    <td>98678873</td>
+                                    <td>WHS67656757</td>
+                                    <td>Service name</td>
+                                    <td>04-11-2024</td>
+                                    <td>
+                                        <span class="status-badge status-pending">Pending</span>
+                                    </td>
+                                    <td>
+                                        <div class="flex gap-1 action-buttons">
+                                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-1 py-0.5 rounded text-xs" title="View" onclick="viewRow3(this)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                            <button class="edit-button px-1 py-0.5 rounded text-xs" title="Edit" onclick="editRow3(this)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                            <button class="text-white px-1 py-0.5 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow3(this)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td>2</td>
+                                    <td>78665234</td>
+                                    <td>GAD98464474</td>
+                                    <td>Service name</td>
+                                    <td>06-11-2024</td>
+                                    <td>
+                                        <span class="status-badge status-in-progress">In Progress</span>
+                                    </td>
+                                    <td>
+                                        <div class="flex gap-1 action-buttons">
+                                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow3(this)">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                            <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow3(this)">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                    <path d="M11 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                            <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow3(this)">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td>3</td>
+                                    <td>98678873</td>
+                                    <td>WHS67656757</td>
+                                    <td>Service name</td>
+                                    <td>04-11-2024</td>
+                                    <td>
+                                        <span class="status-badge status-completed">Completed</span>
+                                    </td>
+                                    <td>
+                                        <div class="flex gap-1 action-buttons">
+                                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-1 py-0.5 rounded text-xs" title="View" onclick="viewRow3(this)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                            <button class="edit-button px-1 py-0.5 rounded text-xs" title="Edit" onclick="editRow3(this)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                            <button class="text-white px-1 py-0.5 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow3(this)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Working Pagination Section -->
+                    <div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t">
+                        <div class="flex items-center gap-2 text-xs text-gray-600">
+                            <span>Rows per page:</span>
+                            <select class="border border-gray-300 rounded px-2 py-1 text-xs" onchange="changeRowsPerPage3(this.value)">
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Working Pagination -->
+                        <div class="flex items-center gap-2 text-xs text-gray-600">
+                            <span id="paginationInfo3">1 of 1</span>
+                            <div id="paginationButtons3" class="flex gap-1">
+                                <!-- Pagination buttons will be dynamically generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for View/Edit -->
+            <div id="dataModal3" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h3 id="modalTitle3" class="text-lg font-semibold text-gray-800">View Details</h3>
+                        <button id="closeModal3" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                    </div>
+                    <div id="modalContent3" class="p-4">
+                        <!-- Content will be dynamically inserted here -->
+                    </div>
+                    <div id="modalActions3" class="flex justify-end gap-2 p-4 border-t">
+                        <button id="cancelBtn3" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                        <button id="saveBtn3" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Modal for Delete -->
+            <div id="deleteModal3" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full" style="background-color: rgba(190, 30, 45, 0.1);">
+                                <svg class="h-6 w-6" style="color: #be1e2d;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Record</h3>
+                            <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this record? This action cannot be undone.</p>
+                            <div class="flex justify-center gap-3">
+                                <button id="cancelDeleteBtn3" class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded">Cancel</button>
+                                <button id="confirmDeleteBtn3" class="px-4 py-2 text-white rounded" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        function initStep3(host) {
+            // Initialize Step 3 with complete table functionality
+            initializeTableData3(host);
+            setupEventListeners3(host);
+            generateAdditionalData3(host);
+            updateTableDisplay3(host);
+        }
+
+        // Step 3 Table Variables
+        let currentRow3 = null;
+        let isEditMode3 = false;
+        let currentSortColumn3 = -1;
+        let currentSortDirection3 = 'asc';
+        let originalTableData3 = [];
+        let filteredTableData3 = [];
+        let currentPage3 = 1;
+        let rowsPerPage3 = 10;
+
+        function initializeTableData3(host) {
+            const tbody = host.querySelector('#dataTable3 tbody');
+            const rows = tbody.querySelectorAll('tr');
+            originalTableData3 = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = {
+                    element: row,
+                    slNo: cells[0].textContent.trim(),
+                    customerId: cells[1].textContent.trim(),
+                    contractId: cells[2].textContent.trim(),
+                    serviceName: cells[3].textContent.trim(),
+                    submissionDate: cells[4].textContent.trim(),
+                    progress: cells[5].textContent.trim()
+                };
+                originalTableData3.push(rowData);
+            });
+            
+            filteredTableData3 = [...originalTableData3];
+        }
+
+        function setupEventListeners3(host) {
+            // Download functionality
+            const downloadBtn = host.querySelector('#downloadBtn3');
+            const downloadDropdown = host.querySelector('#downloadDropdown3');
+            let isDownloadDropdownOpen3 = false;
+
+            if (downloadBtn && downloadDropdown) {
+                downloadBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    isDownloadDropdownOpen3 = !isDownloadDropdownOpen3;
+                    
+                    if (isDownloadDropdownOpen3) {
+                        downloadDropdown.classList.remove('hidden');
+                    } else {
+                        downloadDropdown.classList.add('hidden');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
+                        downloadDropdown.classList.add('hidden');
+                        isDownloadDropdownOpen3 = false;
+                    }
+                });
+            }
+
+            // Filter functionality
+            const filterBtn = host.querySelector('#filterBtn3');
+            const clearBtn = host.querySelector('#clearFilterBtn3');
+            
+            if (filterBtn) filterBtn.addEventListener('click', () => applyFilters3(host));
+            if (clearBtn) clearBtn.addEventListener('click', () => clearFilters3(host));
+
+            // Real-time filtering
+            const filterInputs = [
+                'filterCustomerId3', 'filterContractId3', 'filterServiceName3', 
+                'filterFromDate3', 'filterToDate3', 'filterProgress3'
+            ];
+            
+            filterInputs.forEach(id => {
+                const input = host.querySelector(`#${id}`);
+                if (input) {
+                    if (id.includes('Date') || id.includes('Progress')) {
+                        input.addEventListener('change', () => applyFilters3(host));
+                    } else {
+                        input.addEventListener('input', debounce3(() => applyFilters3(host), 300));
+                    }
+                }
+            });
+
+            // Print functionality
+            const printBtn = host.querySelector('#printBtn3');
+            if (printBtn) printBtn.addEventListener('click', () => printPage3(host));
+
+            // Modal event listeners
+            setupModalListeners3(host);
+        }
+
+        function applyFilters3(host) {
+            const customerId = host.querySelector('#filterCustomerId3').value.toLowerCase().trim();
+            const contractId = host.querySelector('#filterContractId3').value.toLowerCase().trim();
+            const serviceName = host.querySelector('#filterServiceName3').value.toLowerCase().trim();
+            const fromDate = host.querySelector('#filterFromDate3').value;
+            const toDate = host.querySelector('#filterToDate3').value;
+            const progress = host.querySelector('#filterProgress3').value;
+
+            filteredTableData3 = originalTableData3.filter(row => {
+                if (customerId && !row.customerId.toLowerCase().includes(customerId)) return false;
+                if (contractId && !row.contractId.toLowerCase().includes(contractId)) return false;
+                if (serviceName && !row.serviceName.toLowerCase().includes(serviceName)) return false;
+                
+                if (fromDate || toDate) {
+                    const rowDate = parseDate3(row.submissionDate);
+                    if (fromDate && rowDate < parseDate3(fromDate)) return false;
+                    if (toDate && rowDate > parseDate3(toDate)) return false;
+                }
+                
+                if (progress && row.progress !== progress) return false;
+                return true;
+            });
+
+            updateTableDisplay3(host);
+            updateFilterInfo3(host);
+            resetToFirstPage3();
+        }
+
+        function clearFilters3(host) {
+            host.querySelector('#filterCustomerId3').value = '';
+            host.querySelector('#filterContractId3').value = '';
+            host.querySelector('#filterServiceName3').value = '';
+            host.querySelector('#filterFromDate3').value = '';
+            host.querySelector('#filterToDate3').value = '';
+            host.querySelector('#filterProgress3').value = '';
+            
+            filteredTableData3 = [...originalTableData3];
+            updateTableDisplay3(host);
+            host.querySelector('#filterInfo3').classList.add('hidden');
+            resetToFirstPage3();
+        }
+
+        function updateTableDisplay3(host) {
+            const tbody = host.querySelector('#dataTable3 tbody');
+            tbody.innerHTML = '';
+            
+            const startIndex = (currentPage3 - 1) * rowsPerPage3;
+            const endIndex = startIndex + rowsPerPage3;
+            const paginatedData = filteredTableData3.slice(startIndex, endIndex);
+            
+            paginatedData.forEach(row => {
+                tbody.appendChild(row.element);
+            });
+            
+            updateRowNumbers3(host);
+            updatePaginationControls3(host);
+        }
+
+        function updatePaginationControls3(host) {
+            const totalPages = Math.ceil(filteredTableData3.length / rowsPerPage3);
+            const paginationInfo = host.querySelector('#paginationInfo3');
+            const paginationButtons = host.querySelector('#paginationButtons3');
+            
+            if (paginationInfo) {
+                paginationInfo.textContent = `${currentPage3} of ${totalPages}`;
+            }
+            
+            if (paginationButtons) {
+                paginationButtons.innerHTML = '';
+                
+                // Previous buttons
+                const firstBtn = document.createElement('button');
+                firstBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                firstBtn.innerHTML = '«';
+                firstBtn.onclick = () => goToPage3(1, host);
+                firstBtn.disabled = currentPage3 === 1;
+                if (currentPage3 === 1) firstBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                prevBtn.innerHTML = '‹';
+                prevBtn.onclick = () => goToPage3(currentPage3 - 1, host);
+                prevBtn.disabled = currentPage3 === 1;
+                if (currentPage3 === 1) prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                paginationButtons.appendChild(firstBtn);
+                paginationButtons.appendChild(prevBtn);
+                
+                // Page number buttons
+                const startPage = Math.max(1, currentPage3 - 2);
+                const endPage = Math.min(totalPages, currentPage3 + 2);
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `px-2 py-1 border border-gray-300 rounded text-xs ${i === currentPage3 ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`;
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => goToPage3(i, host);
+                    paginationButtons.appendChild(pageBtn);
+                }
+                
+                // Next buttons
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                nextBtn.innerHTML = '›';
+                nextBtn.onclick = () => goToPage3(currentPage3 + 1, host);
+                nextBtn.disabled = currentPage3 === totalPages;
+                if (currentPage3 === totalPages) nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                const lastBtn = document.createElement('button');
+                lastBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                lastBtn.innerHTML = '»';
+                lastBtn.onclick = () => goToPage3(totalPages, host);
+                lastBtn.disabled = currentPage3 === totalPages;
+                if (currentPage3 === totalPages) lastBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                paginationButtons.appendChild(nextBtn);
+                paginationButtons.appendChild(lastBtn);
+            }
+        }
+
+        function goToPage3(page, host) {
+            const totalPages = Math.ceil(filteredTableData3.length / rowsPerPage3);
+            if (page >= 1 && page <= totalPages) {
+                currentPage3 = page;
+                updateTableDisplay3(host);
+            }
+        }
+
+        function resetToFirstPage3() {
+            currentPage3 = 1;
+        }
+
+        function changeRowsPerPage3(newRowsPerPage) {
+            rowsPerPage3 = parseInt(newRowsPerPage);
+            currentPage3 = 1;
+            const host = document.querySelector('#stepContent');
+            updateTableDisplay3(host);
+        }
+
+        function updateFilterInfo3(host) {
+            const totalRows = originalTableData3.length;
+            const filteredRows = filteredTableData3.length;
+            const filterInfo = host.querySelector('#filterInfo3');
+            const filterResultsText = host.querySelector('#filterResultsText3');
+            
+            if (filteredRows < totalRows) {
+                filterResultsText.textContent = `Showing ${filteredRows} of ${totalRows} records`;
+                filterInfo.classList.remove('hidden');
+            } else {
+                filterInfo.classList.add('hidden');
+            }
+        }
+
+        function parseDate3(dateStr) {
+            if (dateStr.includes('-')) {
+                const parts = dateStr.split('-');
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            } else {
+                return new Date(dateStr);
+            }
+        }
+
+        function sortTable3(columnIndex) {
+            const host = document.querySelector('#stepContent');
+            if (currentSortColumn3 === columnIndex) {
+                currentSortDirection3 = currentSortDirection3 === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortDirection3 = 'asc';
+                currentSortColumn3 = columnIndex;
+            }
+
+            filteredTableData3.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch (columnIndex) {
+                    case 0: aVal = parseInt(a.slNo); bVal = parseInt(b.slNo); break;
+                    case 1: aVal = a.customerId.toLowerCase(); bVal = b.customerId.toLowerCase(); break;
+                    case 2: aVal = a.contractId.toLowerCase(); bVal = b.contractId.toLowerCase(); break;
+                    case 3: aVal = a.serviceName.toLowerCase(); bVal = b.serviceName.toLowerCase(); break;
+                    case 4: aVal = parseDate3(a.submissionDate); bVal = parseDate3(b.submissionDate); break;
+                    case 5: aVal = a.progress.toLowerCase(); bVal = b.progress.toLowerCase(); break;
+                    default: return 0;
+                }
+
+                if (aVal < bVal) return currentSortDirection3 === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSortDirection3 === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            updateTableDisplay3(host);
+            updateSortIndicators3(host);
+            resetToFirstPage3();
+        }
+
+        function updateSortIndicators3(host) {
+            const icons = host.querySelectorAll('.sort-icon');
+            icons.forEach(icon => {
+                icon.classList.remove('text-yellow-300', 'text-white');
+                icon.classList.add('text-white');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>';
+            });
+
+            if (currentSortColumn3 >= 0) {
+                const currentIcon = icons[currentSortColumn3];
+                if (currentIcon) {
+                    currentIcon.classList.remove('text-white');
+                    currentIcon.classList.add('text-yellow-300');
+                    
+                    if (currentSortDirection3 === 'asc') {
+                        currentIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+                    } else {
+                        currentIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+                    }
+                }
+            }
+        }
+
+        function updateRowNumbers3(host) {
+            const rows = host.querySelectorAll('#dataTable3 tbody tr');
+            const startNumber = (currentPage3 - 1) * rowsPerPage3 + 1;
+            rows.forEach((row, index) => {
+                const firstCell = row.querySelector('td');
+                if (firstCell) {
+                    firstCell.textContent = startNumber + index;
+                }
+            });
+        }
+
+        function generateAdditionalData3(host) {
+            const currentRows = originalTableData3.length;
+            const additionalRowsNeeded = 10 - currentRows; // Generate 10 total rows like Left+table.html
+            
+            if (additionalRowsNeeded > 0) {
+                const sampleData = [
+                    { customerId: '98678873', contractId: 'WHS67656757', serviceName: 'Service name', date: '04-11-2024', status: 'pending' },
+                    { customerId: '78665234', contractId: 'GAD98464474', serviceName: 'Service name', date: '06-11-2024', status: 'in-progress' },
+                    { customerId: '98678873', contractId: 'WHS67656757', serviceName: 'Service name', date: '04-11-2024', status: 'completed' },
+                    { customerId: '78665234', contractId: 'GAD98464474', serviceName: 'Service name', date: '06-11-2024', status: 'in-progress' },
+                    { customerId: '98678873', contractId: 'WHS67656757', serviceName: 'Service name', date: '04-11-2024', status: 'completed' },
+                    { customerId: '78665234', contractId: 'GAD98464474', serviceName: 'Service name', date: '06-11-2024', status: 'in-progress' },
+                    { customerId: '98678873', contractId: 'WHS67656757', serviceName: 'Service name', date: '04-11-2024', status: 'completed' },
+                    { customerId: '78665234', contractId: 'GAD98464474', serviceName: 'Service name', date: '06-11-2024', status: 'in-progress' },
+                    { customerId: '98678873', contractId: 'WHS67656757', serviceName: 'Service name', date: '04-11-2024', status: 'pending' },
+                    { customerId: '78665234', contractId: 'GAD98464474', serviceName: 'Service name', date: '06-11-2024', status: 'in-progress' }
+                ];
+                
+                const statusClasses = { 'pending': 'status-pending', 'in-progress': 'status-in-progress', 'completed': 'status-completed' };
+                const statusTexts = { 'pending': 'Pending', 'in-progress': 'In Progress', 'completed': 'Completed' };
+                
+                for (let i = 0; i < additionalRowsNeeded; i++) {
+                    const dataIndex = i % sampleData.length;
+                    const data = sampleData[dataIndex];
+                    const rowNumber = currentRows + i + 1;
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'border-b hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td>${rowNumber}</td>
+                        <td>${data.customerId}</td>
+                        <td>${data.contractId}</td>
+                        <td>${data.serviceName}</td>
+                        <td>${data.date}</td>
+                        <td>
+                            <span class="status-badge ${statusClasses[data.status]}">${statusTexts[data.status]}</span>
+                        </td>
+                        <td>
+                            <div class="flex gap-1 action-buttons">
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white" title="View" onclick="viewRow3(this)">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="edit-button" title="Edit" onclick="editRow3(this)">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="text-white" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow3(this)">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    // Add to data arrays instead of directly to DOM
+                    const rowData = {
+                        element: row,
+                        slNo: rowNumber.toString(),
+                        customerId: data.customerId,
+                        contractId: data.contractId,
+                        serviceName: data.serviceName,
+                        submissionDate: data.date,
+                        progress: statusTexts[data.status]
+                    };
+                    
+                    originalTableData3.push(rowData);
+                }
+                
+                // Update filtered data
+                filteredTableData3 = [...originalTableData3];
+            }
+        }
+
+        // Action Button Functions for Step 3
+        function viewRow3(button) {
+            const host = document.querySelector('#stepContent');
+            const row = button.closest('tr');
+            const cells = row.querySelectorAll('td');
+            
+            currentRow3 = row;
+            isEditMode3 = false;
+            
+            const rowData = {
+                slNo: cells[0].textContent.trim(),
+                customerId: cells[1].textContent.trim(),
+                contractId: cells[2].textContent.trim(),
+                serviceName: cells[3].textContent.trim(),
+                submissionDate: cells[4].textContent.trim(),
+                progress: cells[5].textContent.trim()
+            };
+            
+            host.querySelector('#modalTitle3').textContent = 'View Details';
+            
+            const content = `
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Serial Number:</span>
+                        <span class="text-gray-900">${rowData.slNo}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Customer ID:</span>
+                        <span class="text-gray-900">${rowData.customerId}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Contract ID:</span>
+                        <span class="text-gray-900">${rowData.contractId}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Service Name:</span>
+                        <span class="text-gray-900">${rowData.serviceName}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Submission Date:</span>
+                        <span class="text-gray-900">${rowData.submissionDate}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Progress:</span>
+                        <span class="text-gray-900">${rowData.progress}</span>
+                    </div>
+                </div>
+            `;
+            
+            host.querySelector('#modalContent3').innerHTML = content;
+            host.querySelector('#saveBtn3').classList.add('hidden');
+            host.querySelector('#dataModal3').classList.remove('hidden');
+        }
+
+        function editRow3(button) {
+            const host = document.querySelector('#stepContent');
+            const row = button.closest('tr');
+            const cells = row.querySelectorAll('td');
+            
+            currentRow3 = row;
+            isEditMode3 = true;
+            
+            const rowData = {
+                slNo: cells[0].textContent.trim(),
+                customerId: cells[1].textContent.trim(),
+                contractId: cells[2].textContent.trim(),
+                serviceName: cells[3].textContent.trim(),
+                submissionDate: cells[4].textContent.trim(),
+                progress: cells[5].textContent.trim()
+            };
+            
+            host.querySelector('#modalTitle3').textContent = 'Edit Details';
+            
+            const content = `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Serial Number</label>
+                        <input type="text" id="editSlNo3" value="${rowData.slNo}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Customer ID</label>
+                        <input type="text" id="editCustomerId3" value="${rowData.customerId}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contract ID</label>
+                        <input type="text" id="editContractId3" value="${rowData.contractId}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Service Name</label>
+                        <input type="text" id="editServiceName3" value="${rowData.serviceName}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Submission Date</label>
+                        <input type="date" id="editSubmissionDate3" value="${formatDateForInput3(rowData.submissionDate)}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Progress</label>
+                        <select id="editProgress3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Pending" ${rowData.progress === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="In Progress" ${rowData.progress === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Completed" ${rowData.progress === 'Completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            
+            host.querySelector('#modalContent3').innerHTML = content;
+            host.querySelector('#saveBtn3').classList.remove('hidden');
+            host.querySelector('#dataModal3').classList.remove('hidden');
+        }
+
+        function deleteRow3(button) {
+            currentRow3 = button.closest('tr');
+            document.querySelector('#stepContent #deleteModal3').classList.remove('hidden');
+        }
+
+        function formatDateForInput3(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+            return dateStr;
+        }
+
+        function formatDateForDisplay3(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            return dateStr;
+        }
+
+        function setupModalListeners3(host) {
+            host.querySelector('#closeModal3').addEventListener('click', function() {
+                host.querySelector('#dataModal3').classList.add('hidden');
+                currentRow3 = null;
+                isEditMode3 = false;
+            });
+
+            host.querySelector('#cancelBtn3').addEventListener('click', function() {
+                host.querySelector('#dataModal3').classList.add('hidden');
+                currentRow3 = null;
+                isEditMode3 = false;
+            });
+
+            host.querySelector('#saveBtn3').addEventListener('click', function() {
+                if (isEditMode3 && currentRow3) {
+                    const customerId = host.querySelector('#editCustomerId3').value;
+                    const contractId = host.querySelector('#editContractId3').value;
+                    const serviceName = host.querySelector('#editServiceName3').value;
+                    const submissionDate = host.querySelector('#editSubmissionDate3').value;
+                    const progress = host.querySelector('#editProgress3').value;
+                    
+                    const cells = currentRow3.querySelectorAll('td');
+                    cells[1].textContent = customerId;
+                    cells[2].textContent = contractId;
+                    cells[3].textContent = serviceName;
+                    cells[4].textContent = formatDateForDisplay3(submissionDate);
+                    
+                    const progressCell = cells[5];
+                    const statusClass = progress === 'Pending' ? 'status-pending' : 
+                                       progress === 'In Progress' ? 'status-in-progress' : 'status-completed';
+                    progressCell.innerHTML = `<span class="status-badge ${statusClass}">${progress}</span>`;
+                    
+                    showNotification3('Record updated successfully!', 'success');
+                    host.querySelector('#dataModal3').classList.add('hidden');
+                    currentRow3 = null;
+                    isEditMode3 = false;
+                }
+            });
+
+            host.querySelector('#cancelDeleteBtn3').addEventListener('click', function() {
+                host.querySelector('#deleteModal3').classList.add('hidden');
+                currentRow3 = null;
+            });
+
+            host.querySelector('#confirmDeleteBtn3').addEventListener('click', function() {
+                if (currentRow3) {
+                    const cells = currentRow3.querySelectorAll('td');
+                    const customerId = cells[1].textContent.trim();
+                    const contractId = cells[2].textContent.trim();
+                    
+                    currentRow3.remove();
+                    showNotification3(`Record ${customerId} (${contractId}) deleted successfully!`, 'success');
+                    updateRowNumbers3(host);
+                    host.querySelector('#deleteModal3').classList.add('hidden');
+                    currentRow3 = null;
+                }
+            });
+
+            // Close modals when clicking outside
+            host.querySelector('#dataModal3').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                    currentRow3 = null;
+                    isEditMode3 = false;
+                }
+            });
+
+            host.querySelector('#deleteModal3').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                    currentRow3 = null;
+                }
+            });
+        }
+
+        function showNotification3(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white';
+            notification.style.backgroundColor = type === 'success' ? '#10b981' : 
+                                                  type === 'error' ? '#be1e2d' : 
+                                                  '#3b82f6';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function downloadTable3(format) {
+            const host = document.querySelector('#stepContent');
+            const table = host.querySelector('#dataTable3');
+            const rows = table.querySelectorAll('tbody tr');
+            
+            if (format === 'excel') {
+                downloadAsExcel3(rows);
+            } else if (format === 'pdf') {
+                downloadAsPDF3(rows);
+            }
+            
+            host.querySelector('#downloadDropdown3').classList.add('hidden');
+        }
+
+        function downloadAsExcel3(rows) {
+            let csvContent = "Sl. No.,Customer ID,Contract ID,Service Name,Submission Date,Progress\n";
+            
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                
+                for (let i = 0; i < cells.length - 1; i++) {
+                    rowData.push(`"${cells[i].textContent.trim()}"`);
+                }
+                
+                csvContent += rowData.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'table_data.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadAsPDF3(rows) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setProperties({
+                title: 'Table Data Export',
+                subject: 'Department of Posts Data',
+                author: 'DOP IT 2.0',
+                creator: 'DOP IT 2.0'
+            });
+            
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('Department of Posts', 14, 25);
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'normal');
+            doc.text('Ministry of Communications, Government of India', 14, 35);
+            
+            doc.setLineWidth(0.5);
+            doc.line(14, 40, 196, 40);
+            
+            doc.setFontSize(12);
+            doc.text('Data Export Report', 14, 48);
+            doc.text('Generated on: ' + new Date().toLocaleDateString(), 14, 55);
+            
+            const tableData = [];
+            const headers = ['Sl. No.', 'Customer ID', 'Contract ID', 'Service Name', 'Submission Date', 'Progress'];
+            
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                
+                for (let i = 0; i < cells.length - 1; i++) {
+                    rowData.push(cells[i].textContent.trim());
+                }
+                
+                tableData.push(rowData);
+            });
+            
+            doc.autoTable({
+                head: [headers],
+                body: tableData,
+                startY: 65,
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 3,
+                    overflow: 'linebreak',
+                    halign: 'left'
+                },
+                headStyles: {
+                    fillColor: [255, 255, 255],
+                    textColor: [0, 0, 0],
+                    fontStyle: 'bold',
+                    fontSize: 9
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 249, 250]
+                },
+                margin: { top: 65, left: 14, right: 14 },
+                pageBreak: 'auto',
+                showHead: 'everyPage'
+            });
+            
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10);
+            }
+            
+            doc.save('dop_table_data.pdf');
+        }
+
+        function printPage3(host) {
+            const printWindow = window.open('', '_blank');
+            const navHeading = document.querySelector('#navHeading h2');
+            const dynamicTitle = navHeading ? navHeading.textContent : 'Step 3';
+            
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${dynamicTitle}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                        .header h1 { color: #be1e2d; margin: 0; }
+                        .header p { color: #666; margin: 5px 0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; font-weight: bold; }
+                        th svg { width: 12px !important; height: 12px !important; }
+                        .status-badge { font-size: 10px !important; padding: 2px 6px !important; }
+                        .print-info { margin: 20px 0; padding: 10px; background-color: #f9f9f9; border-radius: 5px; }
+                        .print-info p { margin: 5px 0; }
+                        @media print {
+                            .no-print { display: none; }
+                            body { margin: 0; }
+                            th svg { width: 12px !important; height: 12px !important; max-width: 12px !important; }
+                            .status-badge { font-size: 10px !important; padding: 2px 6px !important; }
+                            button { display: none !important; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Department of Posts</h1>
+                        <p>Ministry of Communications, Government of India</p>
+                        <h2 style="color: #be1e2d; font-weight: bold; margin: 10px 0;">${dynamicTitle}</h2>
+                    </div>
+                    
+                    <div class="print-info">
+                        <p><strong>Print Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        <p><strong>Print Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                        <p><strong>User:</strong> System User</p>
+                    </div>
+                    
+                    ${host.querySelector('#dataTable3').outerHTML}
+                    
+                    <div style="margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
+                        <p>This document was generated from ${dynamicTitle} module</p>
+                        <p>© Copyright Department of Posts</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            printWindow.onload = function() {
+                printWindow.print();
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
+            };
+        }
+
+        function debounce3(fn, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    fn(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // -----------------------------
+        // Step 2 Template (from Left+simpleform.html main form)
+        // -----------------------------
+        const step2Template = `
+            <div class="form-container">
+                <div id="formSection2" class="form-section bg-white rounded-lg shadow-sm p-2 overflow-hidden compact-form">
+                    <div class="grid grid-cols-5 gap-2 mb-3">
+                        <div class="form-field-container"><label>Name*</label><input type="text" name="name" required></div>
+                        <div class="form-field-container"><label>Email*</label><input type="email" name="email" required></div>
+                        <div class="form-field-container"><label>Phone*</label><input type="tel" name="phone" required></div>
+                        <div class="form-field-container"><label>Date of Birth*</label><input type="text" name="dob" placeholder="DD/MM/YYYY" required></div>
+                        <div class="form-field-container">
+                            <label>Gender*</label>
+                            <div class="flex items-center space-x-2 mt-2">
+                                <label class="flex items-center"><input type="radio" name="gender" value="male" checked class="mr-1"><span class="text-xs">Male</span></label>
+                                <label class="flex items-center"><input type="radio" name="gender" value="female" class="mr-1"><span class="text-xs">Female</span></label>
+                            </div>
+                        </div>
+                        <div class="form-field-container"><label>State*</label>
+                            <select name="state" required>
+                                <option>Select State</option>
+                                <option>Delhi</option><option>Maharashtra</option><option>Karnataka</option><option>Tamil Nadu</option>
+                            </select>
+                        </div>
+                        <div class="form-field-container"><label>City*</label><input type="text" name="city" required></div>
+                        <div class="form-field-container"><label>Pincode*</label><input type="text" name="pincode" required></div>
+                        <div class="form-field-container"><label>Occupation*</label>
+                            <select name="occupation" required>
+                                <option>Select Occupation</option>
+                                <option>Student</option><option>Employee</option><option>Business Owner</option><option>Professional</option><option>Retired</option>
+                            </select>
+                        </div>
+                        <div class="form-field-container"><label>Annual Income*</label>
+                            <select name="income" required>
+                                <option>Select Income Range</option>
+                                <option>Below 2.5 Lakhs</option><option>2.5 - 5 Lakhs</option><option>5 - 10 Lakhs</option><option>10 - 20 Lakhs</option><option>Above 20 Lakhs</option>
+                            </select>
+                        </div>
+                        <div class="form-field-container">
+                            <label>Marital Status*</label>
+                            <div class="flex items-center space-x-2 mt-2">
+                                <label class="flex items-center"><input type="radio" name="marital_status" value="single" checked class="mr-1"><span class="text-xs">Single</span></label>
+                                <label class="flex items-center"><input type="radio" name="marital_status" value="married" class="mr-1"><span class="text-xs">Married</span></label>
+                            </div>
+                        </div>
+                        <div class="form-field-container"><label>Address</label><input type="text" name="address"></div>
+                        <div class="form-field-container"><label>Emergency Contact</label><input type="tel" name="emergency_contact"></div>
+                        <div class="form-field-container"><label>Blood Group</label>
+                            <select name="blood_group">
+                                <option>Select Blood Group</option>
+                                <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                                <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+                            </select>
+                        </div>
+                        <div class="form-field-container col-span-5"><label>Description</label><textarea name="description" rows="2"></textarea></div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn action-btn-primary" id="previewBtn2">Preview</button>
+                        <button class="action-btn action-btn-success" id="submitBtn2">Submit</button>
+                        <button class="action-btn action-btn-warning" id="clearBtn2">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                <div id="previewSection2" class="preview-section hidden bg-white rounded-lg shadow-sm p-2 overflow-hidden">
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-200 pb-1">
+                        <h3 class="text-base font-semibold text-gray-800">Form Data Preview</h3>
+                        <div class="flex space-x-2">
+                            <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded" id="closePreviewBtn2" title="Close Preview">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="previewContent2" class="bg-gray-100 p-4 rounded text-xs overflow-y-auto" style="height: calc(100vh - 350px); min-height: 400px;">
+                        <div class="text-center text-gray-600">Form preview will appear here...</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        function initStep2(host) {
+            const formSection = host.querySelector('#formSection2');
+            const previewSection = host.querySelector('#previewSection2');
+            const previewBtn = host.querySelector('#previewBtn2');
+            const submitBtn = host.querySelector('#submitBtn2');
+            const clearBtn = host.querySelector('#clearBtn2');
+            const closePreviewBtn = host.querySelector('#closePreviewBtn2');
+
+            function captureFormData2() {
+                const formData = {};
+                host.querySelectorAll('#formSection2 input, #formSection2 select, #formSection2 textarea').forEach((input) => {
+                    if (input.type === 'radio') { if (input.checked) formData[input.name] = input.value; }
+                    else formData[input.name] = input.value || '';
+                });
+                return formData;
+            }
+
+            function displayFormPreview2(data) {
+                const pc = host.querySelector('#previewContent2');
+                if (!pc) return;
+                pc.innerHTML = `
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-800 mb-2 text-sm">Form Data Preview</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><strong>Name:</strong> <span id="p2-name" class="text-gray-600">${data.name || 'Not provided'}</span></div>
+                            <div><strong>Email:</strong> <span id="p2-email" class="text-gray-600">${data.email || 'Not provided'}</span></div>
+                            <div><strong>Phone:</strong> <span id="p2-phone" class="text-gray-600">${data.phone || 'Not provided'}</span></div>
+                            <div><strong>Date of Birth:</strong> <span id="p2-dob" class="text-gray-600">${data.dob || 'Not provided'}</span></div>
+                            <div><strong>Gender:</strong> <span id="p2-gender" class="text-gray-600">${data.gender || 'Not provided'}</span></div>
+                            <div><strong>State:</strong> <span id="p2-state" class="text-gray-600">${data.state || 'Not provided'}</span></div>
+                            <div><strong>City:</strong> <span id="p2-city" class="text-gray-600">${data.city || 'Not provided'}</span></div>
+                            <div><strong>Pincode:</strong> <span id="p2-pincode" class="text-gray-600">${data.pincode || 'Not provided'}</span></div>
+                            <div><strong>Occupation:</strong> <span id="p2-occupation" class="text-gray-600">${data.occupation || 'Not provided'}</span></div>
+                            <div><strong>Annual Income:</strong> <span id="p2-income" class="text-gray-600">${data.income || 'Not provided'}</span></div>
+                            <div><strong>Marital Status:</strong> <span id="p2-marital_status" class="text-gray-600">${data.marital_status || 'Not provided'}</span></div>
+                            <div><strong>Address:</strong> <span id="p2-address" class="text-gray-600">${data.address || 'Not provided'}</span></div>
+                            <div><strong>Emergency Contact:</strong> <span id="p2-emergency_contact" class="text-gray-600">${data.emergency_contact || 'Not provided'}</span></div>
+                            <div><strong>Blood Group:</strong> <span id="p2-blood_group" class="text-gray-600">${data.blood_group || 'Not provided'}</span></div>
+                        </div>
+                        <div class="mt-2">
+                            <strong>Description:</strong>
+                            <div id="p2-description" class="text-gray-600 mt-1 p-2 bg-white rounded border">${data.description || 'Not provided'}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function showPreviewSection2() {
+                previewSection.classList.remove('hidden');
+                formSection.classList.add('compact');
+            }
+
+            function updatePreviewField2(id, value) {
+                const el = host.querySelector('#' + id);
+                if (el) el.textContent = value || 'Not provided';
+            }
+
+            function updateLivePreview2() {
+                if (previewSection.classList.contains('hidden')) return;
+                const data = captureFormData2();
+                updatePreviewField2('p2-name', data.name);
+                updatePreviewField2('p2-email', data.email);
+                updatePreviewField2('p2-phone', data.phone);
+                updatePreviewField2('p2-dob', data.dob);
+                updatePreviewField2('p2-gender', data.gender);
+                updatePreviewField2('p2-state', data.state);
+                updatePreviewField2('p2-city', data.city);
+                updatePreviewField2('p2-pincode', data.pincode);
+                updatePreviewField2('p2-occupation', data.occupation);
+                updatePreviewField2('p2-income', data.income);
+                updatePreviewField2('p2-marital_status', data.marital_status);
+                updatePreviewField2('p2-address', data.address);
+                updatePreviewField2('p2-emergency_contact', data.emergency_contact);
+                updatePreviewField2('p2-blood_group', data.blood_group);
+                updatePreviewField2('p2-description', data.description);
+            }
+
+            function clearForm2() {
+                host.querySelectorAll('#formSection2 input, #formSection2 select, #formSection2 textarea').forEach((input) => {
+                    if (input.type === 'radio') {
+                        if (input.name === 'gender' && input.value === 'male') input.checked = true;
+                        else if (input.name === 'marital_status' && input.value === 'single') input.checked = true;
+                        else input.checked = false;
+                    } else if (['text','email','tel'].includes(input.type)) {
+                        input.value = '';
+                    } else if (input.tagName === 'SELECT') {
+                        input.selectedIndex = 0;
+                    } else if (input.tagName === 'TEXTAREA') {
+                        input.value = '';
+                    }
+                });
+                updateLivePreview2();
+            }
+
+            if (previewBtn) previewBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const data = captureFormData2();
+                displayFormPreview2(data);
+                showPreviewSection2();
+                updateLivePreview2();
+            });
+            if (submitBtn) submitBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const data = captureFormData2();
+                alert('Form submitted successfully!\n\nData:\n' + JSON.stringify(data, null, 2));
+            });
+            if (clearBtn) clearBtn.addEventListener('click', (e) => { e.preventDefault(); clearForm2(); });
+            if (closePreviewBtn) closePreviewBtn.addEventListener('click', (e) => { e.preventDefault(); previewSection.classList.add('hidden'); formSection.classList.remove('compact'); });
+
+            host.querySelectorAll('#formSection2 input, #formSection2 select, #formSection2 textarea').forEach((input) => {
+                input.addEventListener('input', updateLivePreview2);
+                input.addEventListener('change', updateLivePreview2);
+            });
+        }
+    </script>
+</body>
+</html>

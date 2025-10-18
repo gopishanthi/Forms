@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAF Tech - Demo for SRS Preparation</title>
+    <meta name="description" content="Common Template">
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+:root{
+  --headerH: 0px;
+  --footerH: 60px;
+  --sidebarW: 280px;
+}
+
+header, nav { position: relative; z-index: 1100; }
+
+/* Main Content Styles */
+.main-content-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content-area {
+  flex: 1;
+  background: #e7e8e9;
+  padding: 20px;
+}
+
+/* Form Layout Styles */
+.form-container {
+  display: flex;
+  gap: 0.5rem;
+  height: auto;
+  padding: 0.25rem;
+  overflow: visible;
+}
+
+.form-section {
+  flex: 1;
+  transition: width 0.3s ease;
+  overflow: visible;
+  height: auto;
+  max-height: none;
+}
+
+.form-section.compact {
+  width: 50%;
+  flex: 0 0 50%;
+}
+
+.preview-section {
+  width: 50%;
+  flex: 0 0 50%;
+  transition: all 0.3s ease;
+  overflow: visible;
+  height: auto;
+  max-height: none;
+}
+
+.preview-section.hidden {
+  display: none;
+}
+
+/* Form field sizing */
+.form-input {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Compact form styling */
+.compact-form .mb-6 {
+  margin-bottom: 1rem;
+}
+
+.compact-form .mb-4 {
+  margin-bottom: 0.75rem;
+}
+
+.compact-form .mb-3 {
+  margin-bottom: 0.5rem;
+}
+
+.compact-form .mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.compact-form .gap-4 {
+  gap: 0.75rem;
+}
+
+.compact-form .gap-3 {
+  gap: 0.5rem;
+}
+
+.compact-form .gap-2 {
+  gap: 0.5rem;
+}
+
+.compact-form .p-3 {
+  padding: 0.75rem;
+}
+
+.compact-form .p-4 {
+  padding: 1rem;
+}
+
+/* Enhanced Form field styling */
+.form-field-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.form-field-container label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.125rem;
+  letter-spacing: 0.025em;
+  transition: color 0.2s ease;
+  line-height: 1.2;
+}
+
+.form-field-container input,
+.form-field-container select,
+.form-field-container textarea {
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  color: #374151;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-field-container input:hover,
+.form-field-container select:hover,
+.form-field-container textarea:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.form-field-container input:focus,
+.form-field-container select:focus,
+.form-field-container textarea:focus {
+  outline: none;
+  border-color: #be1e2d;
+  box-shadow: 0 0 0 4px rgba(190, 30, 45, 0.15);
+  transform: translateY(-1px);
+}
+
+.form-field-container input::placeholder,
+.form-field-container textarea::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Enhanced Action Buttons */
+.action-buttons {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  border-radius: 0 0 1rem 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  width: 100px;
+  text-align: center;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.action-btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.action-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.action-btn-secondary {
+  background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%);
+  color: white;
+  border-color: #be1e2d;
+  box-shadow: 0 4px 15px rgba(190, 30, 45, 0.3);
+}
+
+.action-btn-secondary:hover {
+  background: linear-gradient(135deg, #9e1825 0%, #7e141e 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(190, 30, 45, 0.4);
+}
+
+.action-btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.action-btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.action-btn-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.action-btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+/* Enhanced Preview styling */
+#previewContent {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  min-height: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+#previewContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #be1e2d 0%, #ea580c 50%, #be1e2d 100%);
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.preview-section:not(.hidden) {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+}
+
+.preview-section:not(.hidden) > div:first-child {
+  flex-shrink: 0;
+}
+
+.preview-section:not(.hidden) #previewContent {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Form container enhancements */
+.compact-form {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
+  overflow: visible;
+}
+
+/* Compact form field widths */
+.compact-form input,
+.compact-form select,
+.compact-form textarea {
+  width: 100%;
+  max-width: 200px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.compact-form textarea {
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Grid cols */
+.grid-cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Column spans */
+.col-span-5 {
+  grid-column: span 5 / span 5;
+}
+
+.col-span-3 {
+  grid-column: span 3 / span 3;
+}
+
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .compact-form .grid-cols-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .compact-form .grid-cols-5,
+  .compact-form .grid-cols-3,
+  .compact-form .grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+}
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="flex flex-col min-h-screen">
+        <div class="flex flex-col min-h-screen">
+            <!-- Main Content Area -->
+            <div class="main-content-wrapper">
+                <!-- Main Content -->
+                <div class="main-content-area bg-gray-50 p-6" style="width: 100%;">
+                    <div class="max-w-full mx-auto">
+                        <!-- Main Form Container -->
+                        <div class="form-container">
+                            <!-- Form Section -->
+                            <div id="formSection" class="form-section bg-white rounded-lg shadow-sm p-2 overflow-hidden compact-form">
+                                <!-- Form Fields -->
+                                <div class="grid grid-cols-5 gap-2 mb-3">
+                                    <div class="form-field-container">
+                                        <label>Name*</label>
+                                        <input type="text" name="name" required>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Email*</label>
+                                        <input type="email" name="email" required>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Phone*</label>
+                                        <input type="tel" name="phone" required>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Date of Birth*</label>
+                                        <input type="text" name="dob" placeholder="DD/MM/YYYY" required>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Gender*</label>
+                                        <div class="flex items-center space-x-2 mt-2">
+                                            <label class="flex items-center">
+                                                <input type="radio" name="gender" value="male" checked class="mr-1">
+                                                <span class="text-xs">Male</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="gender" value="female" class="mr-1">
+                                                <span class="text-xs">Female</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>State*</label>
+                                        <select name="state" required>
+                                            <option>Select State</option>
+                                            <option>Delhi</option>
+                                            <option>Maharashtra</option>
+                                            <option>Karnataka</option>
+                                            <option>Tamil Nadu</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>City*</label>
+                                        <input type="text" name="city" required>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Pincode*</label>
+                                        <input type="text" name="pincode" required>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Occupation*</label>
+                                        <select name="occupation" required>
+                                            <option>Select Occupation</option>
+                                            <option>Student</option>
+                                            <option>Employee</option>
+                                            <option>Business Owner</option>
+                                            <option>Professional</option>
+                                            <option>Retired</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Annual Income*</label>
+                                        <select name="income" required>
+                                            <option>Select Income Range</option>
+                                            <option>Below 2.5 Lakhs</option>
+                                            <option>2.5 - 5 Lakhs</option>
+                                            <option>5 - 10 Lakhs</option>
+                                            <option>10 - 20 Lakhs</option>
+                                            <option>Above 20 Lakhs</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Marital Status*</label>
+                                        <div class="flex items-center space-x-2 mt-2">
+                                            <label class="flex items-center">
+                                                <input type="radio" name="marital_status" value="single" checked class="mr-1">
+                                                <span class="text-xs">Single</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="marital_status" value="married" class="mr-1">
+                                                <span class="text-xs">Married</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Address</label>
+                                        <input type="text" name="address">
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Emergency Contact</label>
+                                        <input type="tel" name="emergency_contact">
+                                    </div>
+                                    <div class="form-field-container">
+                                        <label>Blood Group</label>
+                                        <select name="blood_group">
+                                            <option>Select Blood Group</option>
+                                            <option>A+</option>
+                                            <option>A-</option>
+                                            <option>B+</option>
+                                            <option>B-</option>
+                                            <option>AB+</option>
+                                            <option>AB-</option>
+                                            <option>O+</option>
+                                            <option>O-</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-field-container col-span-5">
+                                        <label>Description</label>
+                                        <textarea name="description" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="action-buttons">
+                                    <button class="action-btn action-btn-primary" id="previewBtn">Preview</button>
+                                    <button class="action-btn action-btn-success" id="submitBtn">Submit</button>
+                                    <button class="action-btn action-btn-warning" id="clearBtn">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Preview Section (Hidden by default) -->
+                            <div id="previewSection" class="preview-section hidden bg-white rounded-lg shadow-sm p-2 overflow-hidden">
+                                <div class="flex justify-between items-center mb-2 border-b border-gray-200 pb-1">
+                                    <h3 class="text-base font-semibold text-gray-800">Form Data Preview</h3>
+                                    <div class="flex space-x-2">
+                                        <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded" onclick="closePreview()" title="Close Preview">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="previewContent" class="bg-gray-100 p-4 rounded text-xs overflow-y-auto" style="height: calc(100vh - 350px); min-height: 400px;">
+                                    <div class="text-center text-gray-600">Form preview will appear here...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+
+        // Form functionality
+        const previewBtn = document.getElementById('previewBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const formSection = document.getElementById('formSection');
+        const previewSection = document.getElementById('previewSection');
+
+        // Function to capture all form data
+        function captureFormData() {
+            const formData = {};
+            
+            // Capture all form inputs
+            const inputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.checked) {
+                        formData[input.name] = input.value;
+                    }
+                } else {
+                    formData[input.name] = input.value || '';
+                }
+            });
+            
+            return formData;
+        }
+
+        // Function to display form preview
+        function displayFormPreview(formData) {
+            const previewContent = document.getElementById('previewContent');
+            
+            if (!previewContent) return;
+            
+            // Create preview content
+            previewContent.innerHTML = `
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2 text-sm">Form Data Preview</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div><strong>Name:</strong> <span id="preview-name" class="text-gray-600">${formData.name || 'Not provided'}</span></div>
+                        <div><strong>Email:</strong> <span id="preview-email" class="text-gray-600">${formData.email || 'Not provided'}</span></div>
+                        <div><strong>Phone:</strong> <span id="preview-phone" class="text-gray-600">${formData.phone || 'Not provided'}</span></div>
+                        <div><strong>Date of Birth:</strong> <span id="preview-dob" class="text-gray-600">${formData.dob || 'Not provided'}</span></div>
+                        <div><strong>Gender:</strong> <span id="preview-gender" class="text-gray-600">${formData.gender || 'Not provided'}</span></div>
+                        <div><strong>State:</strong> <span id="preview-state" class="text-gray-600">${formData.state || 'Not provided'}</span></div>
+                        <div><strong>City:</strong> <span id="preview-city" class="text-gray-600">${formData.city || 'Not provided'}</span></div>
+                        <div><strong>Pincode:</strong> <span id="preview-pincode" class="text-gray-600">${formData.pincode || 'Not provided'}</span></div>
+                        <div><strong>Occupation:</strong> <span id="preview-occupation" class="text-gray-600">${formData.occupation || 'Not provided'}</span></div>
+                        <div><strong>Annual Income:</strong> <span id="preview-income" class="text-gray-600">${formData.income || 'Not provided'}</span></div>
+                        <div><strong>Marital Status:</strong> <span id="preview-marital_status" class="text-gray-600">${formData.marital_status || 'Not provided'}</span></div>
+                        <div><strong>Address:</strong> <span id="preview-address" class="text-gray-600">${formData.address || 'Not provided'}</span></div>
+                        <div><strong>Emergency Contact:</strong> <span id="preview-emergency_contact" class="text-gray-600">${formData.emergency_contact || 'Not provided'}</span></div>
+                        <div><strong>Blood Group:</strong> <span id="preview-blood_group" class="text-gray-600">${formData.blood_group || 'Not provided'}</span></div>
+                    </div>
+                    <div class="mt-2">
+                        <strong>Description:</strong> 
+                        <div id="preview-description" class="text-gray-600 mt-1 p-2 bg-white rounded border">
+                            ${formData.description || 'Not provided'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to show preview section
+        function showPreviewSection() {
+            if (previewSection && formSection) {
+                // Show preview section
+                previewSection.classList.remove('hidden');
+                
+                // Make form section compact (50% width)
+                formSection.classList.add('compact');
+            }
+        }
+
+        // Helper function to update individual preview fields
+        function updatePreviewField(fieldId, value) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.textContent = value || 'Not provided';
+            }
+        }
+
+        // Live preview update function
+        function updateLivePreview() {
+            const previewSection = document.getElementById('previewSection');
+            
+            // If preview is not visible, don't update
+            if (previewSection.classList.contains('hidden')) return;
+            
+            // Capture current form data
+            const formData = captureFormData();
+            
+            // Update all preview fields
+            updatePreviewField('preview-name', formData.name);
+            updatePreviewField('preview-email', formData.email);
+            updatePreviewField('preview-phone', formData.phone);
+            updatePreviewField('preview-dob', formData.dob);
+            updatePreviewField('preview-gender', formData.gender);
+            updatePreviewField('preview-state', formData.state);
+            updatePreviewField('preview-city', formData.city);
+            updatePreviewField('preview-pincode', formData.pincode);
+            updatePreviewField('preview-occupation', formData.occupation);
+            updatePreviewField('preview-income', formData.income);
+            updatePreviewField('preview-marital_status', formData.marital_status);
+            updatePreviewField('preview-address', formData.address);
+            updatePreviewField('preview-emergency_contact', formData.emergency_contact);
+            updatePreviewField('preview-blood_group', formData.blood_group);
+            updatePreviewField('preview-description', formData.description);
+        }
+
+        // Clear form function
+        function clearForm() {
+            // Clear all text inputs, selects, and textareas
+            const allInputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            
+            allInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    // Reset radio buttons to default values
+                    if (input.name === 'gender' && input.value === 'male') {
+                        input.checked = true;
+                    } else if (input.name === 'marital_status' && input.value === 'single') {
+                        input.checked = true;
+                    } else {
+                        input.checked = false;
+                    }
+                } else if (input.type === 'text' || input.type === 'email' || input.type === 'tel') {
+                    // Clear text inputs
+                    input.value = '';
+                } else if (input.tagName === 'SELECT') {
+                    // Reset select to first option
+                    input.selectedIndex = 0;
+                } else if (input.tagName === 'TEXTAREA') {
+                    // Clear textarea
+                    input.value = '';
+                }
+            });
+            
+            // Update live preview if it's visible
+            updateLivePreview();
+            
+            // Show confirmation message
+            alert('Form cleared successfully!');
+        }
+
+        // Close preview function
+        function closePreview() {
+            if (previewSection) {
+                previewSection.classList.add('hidden');
+            }
+            if (formSection) {
+                formSection.classList.remove('compact');
+            }
+        }
+
+        // Event listeners
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Capture all form data
+                const formData = captureFormData();
+                
+                // Display preview with captured data
+                displayFormPreview(formData);
+                
+                // Show preview section and adjust layout
+                showPreviewSection();
+                
+                // Initialize live preview with current data
+                updateLivePreview();
+            });
+        }
+
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Capture form data
+                const formData = captureFormData();
+                
+                // Show success message (demo purpose)
+                alert('Form submitted successfully!\n\nData:\n' + JSON.stringify(formData, null, 2));
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearForm();
+            });
+        }
+
+        // Attach live preview listeners to all form inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const allFormInputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            
+            allFormInputs.forEach(input => {
+                input.addEventListener('input', updateLivePreview);
+                input.addEventListener('change', updateLivePreview);
+            });
+        });
+    </script>
+</body>
+</html>
