@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAF Tech - Demo for SRS Preparation</title>
+    <meta name="description" content="Common Template">
+    <!-- jsPDF Library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+:root{
+  --headerH: 0px;
+  --footerH: 60px;
+}
+
+/* Main Content Styles */
+.main-content-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content-area {
+  flex: 1;
+  background: #e7e8e9;
+  padding: 20px;
+}
+
+        /* Table-related styles from Left Navigation+Table.html */
+        /* Ensure edit buttons are visible */
+        .edit-button {
+          background-color: #db8432 !important; /* orange-500 */
+          color: white !important;
+          border: 2px solid #ea580c !important; /* orange-600 */
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+          font-weight: bold !important;
+        }
+
+        .edit-button:hover {
+          background-color: #ea580c !important; /* orange-600 */
+          border-color: #c2410c !important; /* orange-700 */
+        }
+
+        /* Download dropdown enhancements */
+        #downloadDropdown {
+          animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Table row hover effects */
+        tbody tr:hover {
+          background-color: #f8fafc !important;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          transition: all 0.2s ease;
+        }
+
+        /* Alternating row colors (zebra striping) */
+        tbody tr:nth-child(even) {
+          background-color: #f8f9fa !important;
+        }
+
+        tbody tr:nth-child(odd) {
+          background-color: #ffffff !important;
+        }
+
+        /* Action buttons enhancement */
+        .action-buttons {
+          transition: all 0.2s ease;
+        }
+
+        .action-buttons button:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Status Badge Styles */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+            min-width: 60px;
+        }
+
+        .status-pending {
+            background-color: #be1e2d;
+            color: white;
+        }
+
+        .status-in-progress {
+            background-color: #ea580c;
+            color: white;
+        }
+
+        .status-completed {
+            background-color: #16a34a;
+            color: white;
+}
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="flex flex-col min-h-screen">
+        <div class="flex flex-col min-h-screen">
+            <!-- Main Content Area -->
+            <div class="main-content-wrapper">
+                <!-- Main Content -->
+                <div class="main-content-area bg-gray-50 p-6" style="width: 100%;">
+                    <div class="max-w-full mx-auto">
+                        <!-- Filter Section -->
+                        <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                            <div class="flex flex-wrap items-center gap-3 text-xs">
+                                <div class="flex items-center gap-2">
+                                    <label class="font-medium text-gray-700">Customer ID:</label>
+                                    <input type="text" id="filterCustomerId" placeholder="Enter Customer ID" class="rounded px-2 py-1 w-32 text-xs" style="border: 2px solid #be1e2d;">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="font-medium text-gray-700">Contract ID:</label>
+                                    <input type="text" id="filterContractId" placeholder="Enter Contract ID" class="rounded px-2 py-1 w-32 text-xs" style="border: 2px solid #be1e2d;">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="font-medium text-gray-700">Service Name:</label>
+                                    <input type="text" id="filterServiceName" placeholder="Enter Service Name" class="rounded px-2 py-1 w-32 text-xs" style="border: 2px solid #be1e2d;">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="font-medium text-gray-700">From Date:</label>
+                                    <input type="date" id="filterFromDate" class="rounded px-2 py-1 w-28 text-xs" style="border: 2px solid #be1e2d;">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="font-medium text-gray-700">To Date:</label>
+                                    <input type="date" id="filterToDate" class="rounded px-2 py-1 w-28 text-xs" style="border: 2px solid #be1e2d;">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="font-medium text-gray-700">Progress:</label>
+                                    <select id="filterProgress" class="rounded px-2 py-1 w-28 text-xs" style="border: 2px solid #be1e2d;">
+                                        <option value="">All</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+                                <button id="filterBtn" class="text-white px-3 py-1 rounded text-xs flex items-center gap-1" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="applyFilters()">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 4C3 3.44772 3.44772 3 4 3H20C20.5523 3 21 3.44772 21 4V6.58579C21 6.851 20.8946 7.10536 20.7071 7.29289L14.2929 13.7071C14.1054 13.8946 14 14.149 14 14.4142V17L10 21V14.4142C10 14.149 9.89464 13.8946 9.70711 13.7071L3.29289 7.29289C3.10536 7.10536 3 6.851 3 6.58579V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Filter
+                                </button>
+                                <button id="clearFilterBtn" class="text-white px-3 py-1 rounded text-xs flex items-center gap-1" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="clearFilters()">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Clear
+                                </button>
+                                <div class="flex gap-2 ml-auto">
+                                    <button id="printBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs flex items-center gap-1" onclick="printPage()">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6 2L6 6M6 6L10 6M6 6L6 10M6 18L6 22M6 18L10 18M6 18L6 14M18 2L18 6M18 6L14 6M18 6L18 10M18 18L18 22M18 18L14 18M18 18L18 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        Print
+                                    </button>
+                                    <!-- Download Dropdown -->
+                                    <div class="relative">
+                                        <button id="downloadBtn" class="text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            Download
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        
+                                        <!-- Download Dropdown Menu -->
+                                        <div id="downloadDropdown" class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+                                            <div class="py-2">
+                                                <button onclick="downloadTable('excel')" class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M14 2V8H20" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M16 13H8" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M16 17H8" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M10 9H8" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <div>
+                                                        <div class="font-medium text-gray-900">Download as Excel</div>
+                                                        <div class="text-xs text-gray-500">.xlsx format</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="downloadTable('pdf')" class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M14 2V8H20" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M16 13H8" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M16 17H8" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M10 9H8" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <div>
+                                                        <div class="font-medium text-gray-900">Download as PDF</div>
+                                                        <div class="text-xs text-gray-500">.pdf format</div>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter Results Info -->
+                        <div id="filterInfo" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 hidden">
+                            <div class="flex items-center gap-2 text-sm text-blue-800">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span id="filterResultsText">Showing filtered results</span>
+                            </div>
+                        </div>
+
+                        <!-- Table Section -->
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-xs">
+                                    <thead style="background-color: #be1e2d;">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable(0)">
+                                                <div class="flex items-center gap-1">
+                                                    Sl. No.
+                                                    <svg class="sort-icon w-2 h-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                    </svg>
+                                                </div>
+                                            </th>
+                                            <th class="px-3 py-2 text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable(1)">
+                                                <div class="flex items-center gap-1">
+                                                    Customer ID
+                                                    <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                    </svg>
+                                                </div>
+                                            </th>
+                                            <th class="px-3 py-2 text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable(2)">
+                                                <div class="flex items-center gap-1">
+                                                    Contract ID
+                                                    <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                    </svg>
+                                                </div>
+                                            </th>
+                                            <th class="px-3 py-2 text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable(3)">
+                                                <div class="flex items-center gap-1">
+                                                    Service Name
+                                                    <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                    </svg>
+                                                </div>
+                                            </th>
+                                            <th class="px-3 py-2 text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable(4)">
+                                                <div class="flex items-center gap-1">
+                                                    Submission Date
+                                                    <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                    </svg>
+                                                </div>
+                                            </th>
+                                            <th class="px-3 py-2 text-left font-medium text-white border-b cursor-pointer select-none" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" onclick="sortTable(5)">
+                                                <div class="flex items-center gap-1">
+                                                    Progress
+                                                    <svg class="sort-icon w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                    </svg>
+                                                </div>
+                                            </th>
+                                            <th class="px-3 py-2 text-left font-medium text-white border-b" style="background-color: #be1e2d;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">1</td>
+                                            <td class="px-3 py-2">98678873</td>
+                                            <td class="px-3 py-2">WHS67656757</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">04-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-pending">Pending</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1 action-buttons">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">2</td>
+                                            <td class="px-3 py-2">78665234</td>
+                                            <td class="px-3 py-2">GAD98464474</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">06-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-in-progress">In Progress</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">3</td>
+                                            <td class="px-3 py-2">98678873</td>
+                                            <td class="px-3 py-2">WHS67656757</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">04-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-completed">Completed</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">4</td>
+                                            <td class="px-3 py-2">78665234</td>
+                                            <td class="px-3 py-2">GAD98464474</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">06-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-in-progress">In Progress</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">5</td>
+                                            <td class="px-3 py-2">98678873</td>
+                                            <td class="px-3 py-2">WHS67656757</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">04-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-completed">Completed</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">6</td>
+                                            <td class="px-3 py-2">78665234</td>
+                                            <td class="px-3 py-2">GAD98464474</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">06-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-in-progress">In Progress</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">7</td>
+                                            <td class="px-3 py-2">98678873</td>
+                                            <td class="px-3 py-2">WHS67656757</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">04-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-completed">Completed</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">8</td>
+                                            <td class="px-3 py-2">78665234</td>
+                                            <td class="px-3 py-2">GAD98464474</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">06-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-in-progress">In Progress</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">9</td>
+                                            <td class="px-3 py-2">98678873</td>
+                                            <td class="px-3 py-2">WHS67656757</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">04-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-pending">Pending</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-3 py-2">10</td>
+                                            <td class="px-3 py-2">78665234</td>
+                                            <td class="px-3 py-2">GAD98464474</td>
+                                            <td class="px-3 py-2">Service name</td>
+                                            <td class="px-3 py-2">06-11-2024</td>
+                                            <td class="px-3 py-2">
+                                                <span class="status-badge status-in-progress">In Progress</span>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <div class="flex gap-1">
+                                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="View" onclick="viewRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button class="edit-button px-3 py-1 rounded text-xs" title="Edit" onclick="editRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1">
+                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        
+                                                    </button>
+                                                    <button class="text-white px-2 py-1 rounded text-xs" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'" title="Delete" onclick="deleteRow(this)">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Working Pagination Section -->
+                            <div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t">
+                                <div class="flex items-center gap-2 text-xs text-gray-600">
+                                    <span>Rows per page:</span>
+                                    <select class="border border-gray-300 rounded px-2 py-1 text-xs" onchange="changeRowsPerPage(this.value)">
+                                        <option value="10" selected>10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Working Pagination -->
+                                <div class="flex items-center gap-2 text-xs text-gray-600">
+                                    <span id="paginationInfo">1 of 5</span>
+                                    <div id="paginationButtons" class="flex gap-1">
+                                        <!-- Pagination buttons will be dynamically generated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for View/Edit -->
+            <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">View Details</h3>
+                        <button id="closeModal" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                    </div>
+                    <div id="modalContent" class="p-4">
+                        <!-- Content will be dynamically inserted here -->
+                    </div>
+                    <div id="modalActions" class="flex justify-end gap-2 p-4 border-t">
+                        <button id="cancelBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                        <button id="saveBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Modal for Delete -->
+            <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full" style="background-color: rgba(190, 30, 45, 0.1);">
+                                <svg class="h-6 w-6" style="color: #be1e2d;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Record</h3>
+                            <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this record? This action cannot be undone.</p>
+                            <div class="flex justify-center gap-3">
+                                <button id="cancelDeleteBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded">Cancel</button>
+                                <button id="confirmDeleteBtn" class="px-4 py-2 text-white rounded" style="background-color: #be1e2d;" onmouseover="this.style.backgroundColor='#9e1825'" onmouseout="this.style.backgroundColor='#be1e2d'">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+
+        // ===== TABLE FUNCTIONALITY FROM Left Navigation+Table.html =====
+
+        // Download functionality
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadDropdown = document.getElementById('downloadDropdown');
+        let isDownloadDropdownOpen = false;
+
+        // Toggle download dropdown
+        downloadBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            isDownloadDropdownOpen = !isDownloadDropdownOpen;
+            
+            if (isDownloadDropdownOpen) {
+                downloadDropdown.classList.remove('hidden');
+            } else {
+                downloadDropdown.classList.add('hidden');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
+                downloadDropdown.classList.add('hidden');
+                isDownloadDropdownOpen = false;
+            }
+        });
+
+        // Download table functions
+        function downloadTable(format) {
+            const table = document.querySelector('table');
+            const rows = table.querySelectorAll('tbody tr');
+            
+            if (format === 'excel') {
+                downloadAsExcel(rows);
+            } else if (format === 'pdf') {
+                downloadAsPDF(rows);
+            }
+            
+            // Close dropdown after selection
+            downloadDropdown.classList.add('hidden');
+            isDownloadDropdownOpen = false;
+        }
+
+        function downloadAsExcel(rows) {
+            // Create CSV content (Excel can open CSV files)
+            let csvContent = "Sl. No.,Customer ID,Contract ID,Service Name,Submission Date,Progress\n";
+            
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                
+                // Skip the last cell (Actions column)
+                for (let i = 0; i < cells.length - 1; i++) {
+                    rowData.push(`"${cells[i].textContent.trim()}"`);
+                }
+                
+                csvContent += rowData.join(',') + '\n';
+            });
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'table_data.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadAsPDF(rows) {
+            // Create a new PDF document
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Set document properties
+            doc.setProperties({
+                title: 'Table Data Export',
+                subject: 'Department of Posts Data',
+                author: 'DOP IT 2.0',
+                creator: 'DOP IT 2.0'
+            });
+            
+            // Add standard Department of Posts header
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('Department of Posts', 14, 25);
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'normal');
+            doc.text('Ministry of Communications, Government of India', 14, 35);
+            
+            // Add separator line
+            doc.setLineWidth(0.5);
+            doc.line(14, 40, 196, 40);
+            
+            // Add subtitle
+            doc.setFontSize(12);
+            doc.text('Data Export Report', 14, 48);
+            doc.text('Generated on: ' + new Date().toLocaleDateString(), 14, 55);
+            
+            // Prepare table data
+            const tableData = [];
+            const headers = ['Sl. No.', 'Customer ID', 'Contract ID', 'Service Name', 'Submission Date', 'Progress'];
+            
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                
+                // Skip the last cell (Actions column)
+                for (let i = 0; i < cells.length - 1; i++) {
+                    rowData.push(cells[i].textContent.trim());
+                }
+                
+                tableData.push(rowData);
+            });
+            
+            // Generate table using autoTable (starting below the header)
+            doc.autoTable({
+                head: [headers],
+                body: tableData,
+                startY: 65, // Start table below the header
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 3,
+                    overflow: 'linebreak',
+                    halign: 'left'
+                },
+                headStyles: {
+                    fillColor: [255, 255, 255],
+                    textColor: [0, 0, 0],
+                    fontStyle: 'bold',
+                    fontSize: 9
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 249, 250]
+                },
+                margin: { top: 65, left: 14, right: 14 },
+                pageBreak: 'auto',
+                showHead: 'everyPage'
+            });
+            
+            // Add footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10);
+            }
+            
+            // Save the PDF
+            doc.save('dop_table_data.pdf');
+        }
+
+        // Print functionality
+        function printPage() {
+            // Get current navigation heading
+            const navHeading = document.getElementById('navHeading');
+            const currentHeading = navHeading ? navHeading.querySelector('h2').textContent : 'Home';
+            
+            // Create a print-friendly version of the page
+            const printWindow = window.open('', '_blank');
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${currentHeading} - Print View</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                        .header h1 { color: #be1e2d; margin: 0; }
+                        .header p { color: #666; margin: 5px 0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; font-weight: bold; }
+                        th svg { width: 12px !important; height: 12px !important; }
+                        .status-badge { font-size: 10px !important; padding: 2px 6px !important; }
+                        .print-info { margin: 20px 0; padding: 10px; background-color: #f9f9f9; border-radius: 5px; }
+                        .print-info p { margin: 5px 0; }
+                        @media print {
+                            .no-print { display: none; }
+                            body { margin: 0; }
+                            th svg { width: 12px !important; height: 12px !important; max-width: 12px !important; }
+                            .status-badge { font-size: 10px !important; padding: 2px 6px !important; }
+                            button { display: none !important; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Department of Posts</h1>
+                        <p>Ministry of Communications, Government of India</p>
+                        <h2 style="color: #be1e2d; font-weight: bold; margin: 10px 0;">${currentHeading}</h2>
+                    </div>
+                    
+                    <div class="print-info">
+                        <p><strong>Print Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        <p><strong>Print Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                        <p><strong>User:</strong> System User</p>
+                    </div>
+                    
+                    ${document.querySelector('table').outerHTML}
+                    
+                    <div style="margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
+                        <p>This document was generated from ${currentHeading} module</p>
+                        <p>© Copyright Department of Posts</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load, then print
+            printWindow.onload = function() {
+                printWindow.print();
+                // Close the print window after printing
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
+            };
+        }
+
+        // Action Button Functions
+        let currentRow = null;
+        let isEditMode = false;
+
+        // View Row Function
+        function viewRow(button) {
+            const row = button.closest('tr');
+            const cells = row.querySelectorAll('td');
+            
+            currentRow = row;
+            isEditMode = false;
+            
+            // Get row data
+            const rowData = {
+                slNo: cells[0].textContent.trim(),
+                customerId: cells[1].textContent.trim(),
+                contractId: cells[2].textContent.trim(),
+                serviceName: cells[3].textContent.trim(),
+                submissionDate: cells[4].textContent.trim(),
+                progress: cells[5].textContent.trim()
+            };
+            
+            // Set modal title
+            document.getElementById('modalTitle').textContent = 'View Details';
+            
+            // Create view content
+            const content = `
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Serial Number:</span>
+                        <span class="text-gray-900">${rowData.slNo}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Customer ID:</span>
+                        <span class="text-gray-900">${rowData.customerId}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Contract ID:</span>
+                        <span class="text-gray-900">${rowData.contractId}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Service Name:</span>
+                        <span class="text-gray-900">${rowData.serviceName}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Submission Date:</span>
+                        <span class="text-gray-900">${rowData.submissionDate}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium text-gray-600">Progress:</span>
+                        <span class="text-gray-900">${rowData.progress}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('saveBtn').classList.add('hidden');
+            document.getElementById('dataModal').classList.remove('hidden');
+        }
+
+        // Edit Row Function
+        function editRow(button) {
+            const row = button.closest('tr');
+            const cells = row.querySelectorAll('td');
+            
+            currentRow = row;
+            isEditMode = true;
+            
+            // Get current row data
+            const rowData = {
+                slNo: cells[0].textContent.trim(),
+                customerId: cells[1].textContent.trim(),
+                contractId: cells[2].textContent.trim(),
+                serviceName: cells[3].textContent.trim(),
+                submissionDate: cells[4].textContent.trim(),
+                progress: cells[5].textContent.trim()
+            };
+            
+            // Set modal title
+            document.getElementById('modalTitle').textContent = 'Edit Details';
+            
+            // Create edit form
+            const content = `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Serial Number</label>
+                        <input type="text" id="editSlNo" value="${rowData.slNo}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Customer ID</label>
+                        <input type="text" id="editCustomerId" value="${rowData.customerId}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contract ID</label>
+                        <input type="text" id="editContractId" value="${rowData.contractId}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Service Name</label>
+                        <input type="text" id="editServiceName" value="${rowData.serviceName}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Submission Date</label>
+                        <input type="date" id="editSubmissionDate" value="${formatDateForInput(rowData.submissionDate)}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Progress</label>
+                        <select id="editProgress" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Pending" ${rowData.progress === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="In Progress" ${rowData.progress === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Completed" ${rowData.progress === 'Completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('saveBtn').classList.remove('hidden');
+            document.getElementById('dataModal').classList.remove('hidden');
+        }
+
+        // Delete Row Function
+        function deleteRow(button) {
+            currentRow = button.closest('tr');
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        // Helper function to format date for input
+        function formatDateForInput(dateStr) {
+            // Convert DD-MM-YYYY to YYYY-MM-DD for date input
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+            return dateStr;
+        }
+
+        // Helper function to format date for display
+        function formatDateForDisplay(dateStr) {
+            // Convert YYYY-MM-DD to DD-MM-YYYY for display
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            return dateStr;
+        }
+
+        // Modal Event Listeners
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('dataModal').classList.add('hidden');
+            currentRow = null;
+            isEditMode = false;
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            document.getElementById('dataModal').classList.add('hidden');
+            currentRow = null;
+            isEditMode = false;
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            if (isEditMode && currentRow) {
+                // Get form values
+                const customerId = document.getElementById('editCustomerId').value;
+                const contractId = document.getElementById('editContractId').value;
+                const serviceName = document.getElementById('editServiceName').value;
+                const submissionDate = document.getElementById('editSubmissionDate').value;
+                const progress = document.getElementById('editProgress').value;
+                
+                // Update the row
+                const cells = currentRow.querySelectorAll('td');
+                cells[1].textContent = customerId;
+                cells[2].textContent = contractId;
+                cells[3].textContent = serviceName;
+                cells[4].textContent = formatDateForDisplay(submissionDate);
+                
+                // Update progress with proper badge
+                const progressCell = cells[5];
+                const statusClass = progress === 'Pending' ? 'status-pending' : 
+                                   progress === 'In Progress' ? 'status-in-progress' : 'status-completed';
+                progressCell.innerHTML = `<span class="status-badge ${statusClass}">${progress}</span>`;
+                
+                // Show success message
+                showNotification('Record updated successfully!', 'success');
+                
+                // Close modal
+                document.getElementById('dataModal').classList.add('hidden');
+                currentRow = null;
+                isEditMode = false;
+            }
+        });
+
+        // Delete Modal Event Listeners
+        document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            currentRow = null;
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (currentRow) {
+                // Get row data for confirmation message
+                const cells = currentRow.querySelectorAll('td');
+                const customerId = cells[1].textContent.trim();
+                const contractId = cells[2].textContent.trim();
+                
+                // Remove the row
+                currentRow.remove();
+                
+                // Show success message
+                showNotification(`Record ${customerId} (${contractId}) deleted successfully!`, 'success');
+                
+                // Update row numbers
+                updateRowNumbers();
+                
+                // Close modal
+                document.getElementById('deleteModal').classList.add('hidden');
+                currentRow = null;
+            }
+        });
+
+        // Update row numbers after deletion
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('tbody tr');
+            const startNumber = (currentPage - 1) * rowsPerPage + 1;
+            rows.forEach((row, index) => {
+                const firstCell = row.querySelector('td');
+                if (firstCell) {
+                    firstCell.textContent = startNumber + index;
+                }
+            });
+        }
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white';
+            notification.style.backgroundColor = type === 'success' ? '#10b981' : 
+                                                  type === 'error' ? '#be1e2d' : 
+                                                  '#3b82f6';
+            notification.textContent = message;
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modals when clicking outside
+        document.getElementById('dataModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                currentRow = null;
+                isEditMode = false;
+            }
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                currentRow = null;
+            }
+        });
+
+        // Filter and Sort Functionality
+        let currentSortColumn = -1;
+        let currentSortDirection = 'asc';
+        let originalTableData = [];
+        let filteredTableData = [];
+        let currentPage = 1;
+        let rowsPerPage = 10;
+
+        // Initialize table data
+        function initializeTableData() {
+            const tbody = document.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            originalTableData = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = {
+                    element: row,
+                    slNo: cells[0].textContent.trim(),
+                    customerId: cells[1].textContent.trim(),
+                    contractId: cells[2].textContent.trim(),
+                    serviceName: cells[3].textContent.trim(),
+                    submissionDate: cells[4].textContent.trim(),
+                    progress: cells[5].textContent.trim()
+                };
+                originalTableData.push(rowData);
+            });
+            
+            filteredTableData = [...originalTableData];
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const customerId = document.getElementById('filterCustomerId').value.toLowerCase().trim();
+            const contractId = document.getElementById('filterContractId').value.toLowerCase().trim();
+            const serviceName = document.getElementById('filterServiceName').value.toLowerCase().trim();
+            const fromDate = document.getElementById('filterFromDate').value;
+            const toDate = document.getElementById('filterToDate').value;
+            const progress = document.getElementById('filterProgress').value;
+
+            filteredTableData = originalTableData.filter(row => {
+                // Customer ID filter
+                if (customerId && !row.customerId.toLowerCase().includes(customerId)) {
+                    return false;
+                }
+                
+                // Contract ID filter
+                if (contractId && !row.contractId.toLowerCase().includes(contractId)) {
+                    return false;
+                }
+                
+                // Service Name filter
+                if (serviceName && !row.serviceName.toLowerCase().includes(serviceName)) {
+                    return false;
+                }
+                
+                // Date range filter
+                if (fromDate || toDate) {
+                    const rowDate = parseDate(row.submissionDate);
+                    if (fromDate && rowDate < parseDate(fromDate)) {
+                        return false;
+                    }
+                    if (toDate && rowDate > parseDate(toDate)) {
+                        return false;
+                    }
+                }
+                
+                // Progress filter
+                if (progress && row.progress !== progress) {
+                    return false;
+                }
+                
+                return true;
+            });
+
+            updateTableDisplay();
+            updateFilterInfo();
+            resetToFirstPage();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('filterCustomerId').value = '';
+            document.getElementById('filterContractId').value = '';
+            document.getElementById('filterServiceName').value = '';
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            document.getElementById('filterProgress').value = '';
+            
+            filteredTableData = [...originalTableData];
+            updateTableDisplay();
+            document.getElementById('filterInfo').classList.add('hidden');
+            resetToFirstPage();
+        }
+
+        // Update table display with pagination
+        function updateTableDisplay() {
+            const tbody = document.querySelector('tbody');
+            
+            // Clear the tbody
+            tbody.innerHTML = '';
+            
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedData = filteredTableData.slice(startIndex, endIndex);
+            
+            // Add rows for current page
+            paginatedData.forEach(row => {
+                tbody.appendChild(row.element);
+            });
+            
+            // Update row numbers for current page
+            updateRowNumbers();
+            
+            // Update pagination controls
+            updatePaginationControls();
+        }
+
+        // Update pagination controls
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(filteredTableData.length / rowsPerPage);
+            const paginationInfo = document.getElementById('paginationInfo');
+            const paginationButtons = document.getElementById('paginationButtons');
+            
+            // Update pagination info
+            if (paginationInfo) {
+                paginationInfo.textContent = `${currentPage} of ${totalPages}`;
+            }
+            
+            // Update pagination buttons
+            if (paginationButtons) {
+                paginationButtons.innerHTML = '';
+                
+                // Previous buttons
+                const firstBtn = document.createElement('button');
+                firstBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                firstBtn.innerHTML = '«';
+                firstBtn.onclick = () => goToPage(1);
+                firstBtn.disabled = currentPage === 1;
+                if (currentPage === 1) firstBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                prevBtn.innerHTML = '‹';
+                prevBtn.onclick = () => goToPage(currentPage - 1);
+                prevBtn.disabled = currentPage === 1;
+                if (currentPage === 1) prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                paginationButtons.appendChild(firstBtn);
+                paginationButtons.appendChild(prevBtn);
+                
+                // Page number buttons
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(totalPages, currentPage + 2);
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `px-2 py-1 border border-gray-300 rounded text-xs ${i === currentPage ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`;
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => goToPage(i);
+                    paginationButtons.appendChild(pageBtn);
+                }
+                
+                // Next buttons
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                nextBtn.innerHTML = '›';
+                nextBtn.onclick = () => goToPage(currentPage + 1);
+                nextBtn.disabled = currentPage === totalPages;
+                if (currentPage === totalPages) nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                const lastBtn = document.createElement('button');
+                lastBtn.className = 'px-2 py-1 border border-gray-300 rounded hover:bg-gray-100 text-xs';
+                lastBtn.innerHTML = '»';
+                lastBtn.onclick = () => goToPage(totalPages);
+                lastBtn.disabled = currentPage === totalPages;
+                if (currentPage === totalPages) lastBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                paginationButtons.appendChild(nextBtn);
+                paginationButtons.appendChild(lastBtn);
+            }
+        }
+        
+        // Go to specific page
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredTableData.length / rowsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                updateTableDisplay();
+            }
+        }
+        
+        // Reset to first page when filtering
+        function resetToFirstPage() {
+            currentPage = 1;
+        }
+        
+        // Change rows per page
+        function changeRowsPerPage(newRowsPerPage) {
+            rowsPerPage = parseInt(newRowsPerPage);
+            currentPage = 1; // Reset to first page
+            updateTableDisplay();
+        }
+        
+        // Update filter info
+        function updateFilterInfo() {
+            const totalRows = originalTableData.length;
+            const filteredRows = filteredTableData.length;
+            
+            if (filteredRows < totalRows) {
+                document.getElementById('filterResultsText').textContent = 
+                    `Showing ${filteredRows} of ${totalRows} records`;
+                document.getElementById('filterInfo').classList.remove('hidden');
+            } else {
+                document.getElementById('filterInfo').classList.add('hidden');
+            }
+        }
+
+        // Parse date for comparison
+        function parseDate(dateStr) {
+            if (dateStr.includes('-')) {
+                // DD-MM-YYYY format
+                const parts = dateStr.split('-');
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            } else {
+                // YYYY-MM-DD format
+                return new Date(dateStr);
+            }
+        }
+
+        // Sort table
+        function sortTable(columnIndex) {
+            // Toggle sort direction if clicking the same column
+            if (currentSortColumn === columnIndex) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortDirection = 'asc';
+                currentSortColumn = columnIndex;
+            }
+
+            // Sort the filtered data
+            filteredTableData.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch (columnIndex) {
+                    case 0: // Sl. No.
+                        aVal = parseInt(a.slNo);
+                        bVal = parseInt(b.slNo);
+                        break;
+                    case 1: // Customer ID
+                        aVal = a.customerId.toLowerCase();
+                        bVal = b.customerId.toLowerCase();
+                        break;
+                    case 2: // Contract ID
+                        aVal = a.contractId.toLowerCase();
+                        bVal = b.contractId.toLowerCase();
+                        break;
+                    case 3: // Service Name
+                        aVal = a.serviceName.toLowerCase();
+                        bVal = b.serviceName.toLowerCase();
+                        break;
+                    case 4: // Submission Date
+                        aVal = parseDate(a.submissionDate);
+                        bVal = parseDate(b.submissionDate);
+                        break;
+                    case 5: // Progress
+                        aVal = a.progress.toLowerCase();
+                        bVal = b.progress.toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aVal < bVal) {
+                    return currentSortDirection === 'asc' ? -1 : 1;
+                }
+                if (aVal > bVal) {
+                    return currentSortDirection === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            updateTableDisplay();
+            updateSortIndicators();
+            resetToFirstPage();
+        }
+
+        // Update sort indicators
+        function updateSortIndicators() {
+            // Reset all indicators
+            document.querySelectorAll('.sort-icon').forEach(icon => {
+                icon.classList.remove('text-yellow-300', 'text-white');
+                icon.classList.add('text-white');
+                
+                // Reset to default double arrow
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>';
+            });
+
+            // Update current sort column indicator
+            if (currentSortColumn >= 0) {
+                const currentIcon = document.querySelectorAll('.sort-icon')[currentSortColumn];
+                if (currentIcon) {
+                    currentIcon.classList.remove('text-white');
+                    currentIcon.classList.add('text-yellow-300');
+                    
+                    // Set appropriate arrow direction
+                    if (currentSortDirection === 'asc') {
+                        currentIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+                    } else {
+                        currentIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+                    }
+                }
+            }
+        }
+
+        // Real-time filtering as user types
+        document.getElementById('filterCustomerId').addEventListener('input', debounce(applyFilters, 300));
+        document.getElementById('filterContractId').addEventListener('input', debounce(applyFilters, 300));
+        document.getElementById('filterServiceName').addEventListener('input', debounce(applyFilters, 300));
+        document.getElementById('filterFromDate').addEventListener('change', applyFilters);
+        document.getElementById('filterToDate').addEventListener('change', applyFilters);
+        document.getElementById('filterProgress').addEventListener('change', applyFilters);
+
+        // Debounce function for real-time filtering
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            initializeTableData();
+            updateTableDisplay(); // Ensure pagination is applied immediately
+        });
+        
+    </script>
+</body>
+</html>
